@@ -5,8 +5,8 @@
   "mounts": [
     {
       "type": "bind",
-      "source": "/biggie/users/vincenzo/ai-repos",
-      "target": "/repos"
+      "source": "/home/VoxLogicA",
+      "target": "/home/VoxLogicA"
     }
   ],
   "runArgs": [
