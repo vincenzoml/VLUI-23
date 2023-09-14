@@ -30,6 +30,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@niivue/niivue": "^0.37.1"
+		"@niivue/niivue": "^0.37.1",
+		"@types/execa": "^2.0.0",
+		"axios": "^1.5.0",
+		"execa": "^8.0.1"
 	}
 }

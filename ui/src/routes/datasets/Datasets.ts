@@ -1,35 +1,51 @@
 import { promises as fs } from 'fs'
+import { listSubdirs } from './Util'
+import type { DatasetLoader } from './DatasetLoader'
 
 const basePath = "/home/VoxLogicA"
 const datasetsPath = `${basePath}/datasets`
 
 export async function listDatasets() {
-    const files = (await fs.readdir(datasetsPath))
-    let dirs: string[] = []
-    for (const file of files) {
-        const st = await fs.stat(`${datasetsPath}/${file}`)
-        if (st.isDirectory()) {
-            try {
-                await fs.access(`${datasetsPath}/${file}/dataset.json`)                            
-                dirs.push(file)
-            } catch (e : any) {
-                if (e.code && e.code != "ENOENT") console.warn(e)
-            }
+    const result = []
+    const dirs = await listSubdirs(datasetsPath)
+    for (const dir of dirs) {
+        try {
+            await fs.access(`${datasetsPath}/${dir}/dataset.json`)
+            result.push(dir)
+        } catch (e: any) {
+            if (e.code && e.code != "ENOENT") console.warn(e)
         }
     }
-    return dirs
+
+    return result
 }
 
-export async function getDataset(dataset : string) {
-    const datasets = await listDatasets() 	
-	
-	if (datasets.includes(dataset)) {
+async function getLoader(dataset: string) {
+    const datasets = await listDatasets()
+
+    if (datasets.includes(dataset)) {
         const contents = await fs.readFile(`${datasetsPath}/${dataset}/dataset.json`)
         const json = JSON.parse(contents.toString())
         if (json.layout) {
-            const module = await import ('./brats')
-            const result = await module.default(`${datasetsPath}/${dataset}`)
-            return result            
+            const loadedModule = await import(`./${json.layout}.ts`)
+            return loadedModule.default as DatasetLoader
+        }
+    }
+}
+
+export async function listItems(dataset: string) {
+    const loadedModule = await getLoader(dataset)
+    const items = await loadedModule?.listItems(`${datasetsPath}/${dataset}`)
+    return items
+}
+
+export async function listLayers(dataset: string, item: string) {
+    const loadedModule = await getLoader(dataset)
+    if (loadedModule) {
+        const items = await loadedModule.listItems(`${datasetsPath}/${dataset}`)
+        if (items.includes(item)) {
+            const layers = await loadedModule.listLayers(`${datasetsPath}/${dataset}`, item)
+            return layers
         }
     }
 }
