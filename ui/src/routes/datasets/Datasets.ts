@@ -52,11 +52,12 @@ export async function listLayers(dataset: string, item: string) {
 }
 
 export async function resolveLayer(dataset: string, item: string, path: string) {
+    console.log("resolve layer",dataset,item,path)
     const loadedModule = await getLoader(dataset)
     if (loadedModule) {
         const items = await loadedModule.listItems(`${datasetsPath}/${dataset}`)
         if (items.includes(item)) {
-            const layers = await loadedModule.listLayers(`${datasetsPath}/${dataset}`, item)
+            const layers = await loadedModule.listLayers(`${datasetsPath}/${dataset}`, item)            
             const found = layers.find((layer => (layer.path == path)))
             if (found) {
                 return `${datasetsPath}/${dataset}/${item}/${path}`

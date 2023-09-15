@@ -1,11 +1,26 @@
-import { getContext } from "svelte"
+import { setContext,getContext } from "svelte"
 import type { Writable } from "svelte/store"
 import { writable } from "svelte/store"
 
-export type Store = Writable<{ datasets: string[] }>
+export type Layer = {
+    name: string
+}
+
+export type Item = {
+    name: string,
+    dataset: string
+}
+
+export type Store = Writable<{
+    datasets: string[],
+    selectedDataset?: string
+    itemsOfSelectedDataset: string[]
+    openItems: Record<string,Item>
+}>
 
 export function createStore() {
-    const store : Store = writable({ datasets: [] }) 
+    const store: Store = writable({ datasets: [], itemsOfSelectedDataset: [], openItems: {} })
+    setContext('store', store)
     return store
 }
 
