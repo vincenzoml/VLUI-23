@@ -13,8 +13,6 @@ export async function POST({ request }) {
 
 
   // Read from the pipe using the executable
-  const { stdout } = await execa(voxlogica, [specificationPath])
-
-  console.log(stdout)
+  const { stdout } = await execa(voxlogica, ["--json", specificationPath])
   return json(stdout)
 }

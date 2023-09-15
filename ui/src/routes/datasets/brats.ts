@@ -16,10 +16,14 @@ function getLayerName(item: string, file: string) {
     return item
 }
 
+// async function resolveLayer(path: string, item: string, layer: string) {
+//     return `${path}/${item}/${item}_${layer}.nii.gz`
+// }
+
 async function listLayers(path: string, item: string) {
     const regex = /\.nii(\.gz)?$/
     const files = await listAllowed(`${path}/${item}`, regex)
-    return files.map((file: string) => ({ name: getLayerName(item,file), path: file }))
+    return files.map((file: string) => ({ name: getLayerName(item, file), path: file }))
 }
 
 export default { listItems, listLayers } as DatasetLoader

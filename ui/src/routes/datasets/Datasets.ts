@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import { listSubdirs } from './Util'
 import type { DatasetLoader } from './DatasetLoader'
+import { send } from 'vite'
 
 const basePath = "/home/VoxLogicA"
 const datasetsPath = `${basePath}/datasets`
@@ -46,6 +47,20 @@ export async function listLayers(dataset: string, item: string) {
         if (items.includes(item)) {
             const layers = await loadedModule.listLayers(`${datasetsPath}/${dataset}`, item)
             return layers
+        }
+    }
+}
+
+export async function resolveLayer(dataset: string, item: string, path: string) {
+    const loadedModule = await getLoader(dataset)
+    if (loadedModule) {
+        const items = await loadedModule.listItems(`${datasetsPath}/${dataset}`)
+        if (items.includes(item)) {
+            const layers = await loadedModule.listLayers(`${datasetsPath}/${dataset}`, item)
+            const found = layers.find((layer => (layer.path == path)))
+            if (found) {
+                return `${datasetsPath}/${dataset}/${item}/${path}`
+            }
         }
     }
 }
