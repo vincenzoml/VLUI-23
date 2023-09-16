@@ -1,6 +1,9 @@
-import { setContext,getContext } from "svelte"
+import { setContext, getContext } from "svelte"
 import type { Writable } from "svelte/store"
 import { writable } from "svelte/store"
+
+import { getUID } from '$lib/uniqueId'
+
 
 export type Layer = {
     name: string
@@ -10,7 +13,11 @@ export type Item = {
     name: string,
     dataset: string,
     path: string,
-    uuid: string
+    uuid: string,
+    layers: {
+        name: string,
+        path: string
+    }[]
 }
 
 export type Store = Writable<{
@@ -20,13 +27,33 @@ export type Store = Writable<{
     openItems: Item[]
 }>
 
-export function createStore() {
-    const store: Store = writable({ datasets: [], itemsOfSelectedDataset: [], openItems: [] })
-    setContext('store', store)
-    return store
-}
 
 export function getStore() {
-    const store: Store = getContext('store')
-    return store
+    return getContext('store') as Store
+}
+
+export function getState() {
+    return getContext('state') as State
+}
+
+export class State {
+    store: Store = writable({ datasets: [], itemsOfSelectedDataset: [], openItems: [] }) // todo: make the public version readonly
+
+    async openItem(dataset: string, item: string) {
+        this.store.update($store => {
+            const newItem = {
+                name: item,
+                dataset: dataset,
+                path: `/${dataset}/${item}`,
+                uuid: getUID(),
+                layers: []
+            }
+            return { ...$store, openItems: [...$store.openItems, newItem] }
+        })
+    }
+
+    constructor() {
+        setContext('store', this.store)
+        setContext('state', this)
+    }
 }

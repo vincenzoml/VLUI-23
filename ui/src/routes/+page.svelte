@@ -1,7 +1,7 @@
 <script lang="ts">
 	import axios from 'axios'
 	import { onMount, setContext } from 'svelte'
-	import { createStore } from '../components/Store'
+	import { State } from '../components/Store'
 	import { derived } from 'svelte/store'
 
 	import DatasetSelector from '../components/DatasetSelector.svelte'
@@ -16,7 +16,8 @@
 		const result = JSON.parse(response.data)
 	}
 
-	const store = createStore()
+	const state = new State()
+	const store = state.store
 
 	onMount(async () => {
 		const datasets=(await axios.get('/datasets')).data
@@ -32,8 +33,6 @@
 		setTimeout(() => { if (datasets.length>0) $store.selectedDataset=datasets[0] },200)
 	})
 </script>
-
-<button on:click={()=>console.log(JSON.stringify($store.openItems))}>CLICK</button>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div style="display:flex;height:100%;overflow:hidden">
