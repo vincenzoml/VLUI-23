@@ -4,7 +4,6 @@ import { promises as fs } from 'fs'
 
 export async function GET(request) {
 	const filePath = await resolveLayer(request.params.dataset, request.params.item, request.params.path)
-	console.log("**********",filePath)	
 	if (filePath) {
 		const fileContent = Uint8Array.from(await fs.readFile(filePath))
 		const response = new Response(fileContent)

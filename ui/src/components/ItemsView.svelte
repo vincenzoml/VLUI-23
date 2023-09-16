@@ -4,10 +4,10 @@
 	const store = getStore()
 </script>
 
-<div style="display:flex;justify-content: left;flex-wrap: wrap;">
-	{#each Object.keys($store.openItems) as path}
+<div style="display:flex;justify-content: left;flex-wrap: wrap">
+	{#each $store.openItems as item (item.uuid)}
 		<div style="margin: 10px;">
-			<ItemView {path} item={$store.openItems[path]} />
+			<ItemView path={item.path} {item} />
 		</div>
 	{/each}
 </div>

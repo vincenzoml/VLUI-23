@@ -1,35 +1,42 @@
 <script lang="ts">
 	//@ts-ignore
 	import { onMount } from 'svelte'
+	import { getStore } from './Store'
+	import { derived } from 'svelte/store'
 
 	// make an array of volumes to load
 
 	export let src: string
 	export let overlays: string[] = []
-	let canvasID: string 
-	onMount(async () => {
-		const { getUID } = await import('$lib/uniqueId')
-		canvasID=`${getUID()}`
-		console.log(canvasID)
+	export let canvasID: string
+	const store = getStore()
+
+	let nv:any;
+
+	const cid = canvasID
+	
+	onMount(async () => {				
 		//@ts-ignore
-		const { Niivue , NVImage } = await import('@niivue/niivue')
-		const nv = new Niivue({ isResizeCanvas: true })
-		nv.attachTo(canvasID)
+		const { Niivue } = await import('@niivue/niivue')
+		nv = new Niivue({ isResizeCanvas: true })
+		nv.attachTo(cid)
+		store.subscribe($st=> console.log("IN NV",nv,canvasID,cid))
+
 		nv.setSliceType(nv.sliceTypeAxial)
 		nv.addVolumeFromUrl({ url: src, imageType: 1 })		
-	})
+	})	
 
 	function setOverlay(overlay: string, i: number) {
-		console.log('setOverlay', overlay, i)		
 	}
 
 	$: {
 		overlays.forEach(setOverlay) 
 	}
 
+
 	// https://niivue.github.io/niivue/devdocs/
 </script>
 
 <div style="display:contents">
-	<canvas id={canvasID} style="width:100%;aspect-ratio: 1;" />
+	<canvas id={cid} style="width:100%;aspect-ratio: 1;" />
 </div>

@@ -17,6 +17,7 @@
 	"devDependencies": {
 		"@material/elevation": "^14.0.0",
 		"@material/typography": "^14.0.0",
+		"@smui/card": "^7.0.0-beta.15",
 		"@smui/icon-button": "^7.0.0-beta.15",
 		"@smui/list": "^7.0.0-beta.15",
 		"@smui/select": "^7.0.0-beta.15",
@@ -45,8 +46,10 @@
 		"@smui/data-table": "^7.0.0-beta.15",
 		"@types/execa": "^2.0.0",
 		"@types/send": "^0.17.1",
+		"@types/uuid": "^9.0.4",
 		"axios": "^1.5.0",
 		"execa": "^8.0.1",
-		"send": "^0.18.0"
+		"send": "^0.18.0",
+		"uuid": "^9.0.1"
 	}
 }

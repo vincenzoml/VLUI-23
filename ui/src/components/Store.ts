@@ -8,18 +8,20 @@ export type Layer = {
 
 export type Item = {
     name: string,
-    dataset: string
+    dataset: string,
+    path: string,
+    uuid: string
 }
 
 export type Store = Writable<{
     datasets: string[],
     selectedDataset?: string
     itemsOfSelectedDataset: string[]
-    openItems: Record<string,Item>
+    openItems: Item[]
 }>
 
 export function createStore() {
-    const store: Store = writable({ datasets: [], itemsOfSelectedDataset: [], openItems: {} })
+    const store: Store = writable({ datasets: [], itemsOfSelectedDataset: [], openItems: [] })
     setContext('store', store)
     return store
 }

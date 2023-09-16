@@ -14,7 +14,6 @@
 			items: []
 		})
 		const result = JSON.parse(response.data)
-		console.log(result.print)
 	}
 
 	const store = createStore()
@@ -25,16 +24,16 @@
 		const selectedDataset = derived(store, ($store) => $store.selectedDataset)
 		selectedDataset.subscribe((dataset) => {
 			if (dataset) {
-				console.log(`fetch ${dataset}`)
 				axios
 					.get(`/datasets/${dataset}`)
 					.then((response) => ($store.itemsOfSelectedDataset = response.data))
 			}
 		})
-		console.log("setting",datasets[0])
-		setTimeout(() => { if (datasets.length>0) $store.selectedDataset=datasets[0] },1000)
+		setTimeout(() => { if (datasets.length>0) $store.selectedDataset=datasets[0] },200)
 	})
 </script>
+
+<button on:click={()=>console.log(JSON.stringify($store.openItems))}>CLICK</button>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div style="display:flex;height:100%;overflow:hidden">
