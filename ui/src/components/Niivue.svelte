@@ -20,7 +20,6 @@
 		const { Niivue } = await import('@niivue/niivue')
 		nv = new Niivue({ isResizeCanvas: true })
 		nv.attachTo(cid)
-		store.subscribe($st=> console.log("IN NV",nv,canvasID,cid))
 
 		nv.setSliceType(nv.sliceTypeAxial)
 		nv.addVolumeFromUrl({ url: src, imageType: 1 })		

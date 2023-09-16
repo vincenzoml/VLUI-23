@@ -7,7 +7,7 @@
 	$: dataset = $store.selectedDataset as string
 </script>
 
-<div style="height:100%;width:100%;overflow:auto;display:flex;flex-direction: column;gap:4px">
+<div style="height:100%;width:100%;padding:0px;overflow:auto;display:flex;flex-direction: column;gap:4px">
 	{#each $store.itemsOfSelectedDataset as item}
 		<Button
 			color="primary"

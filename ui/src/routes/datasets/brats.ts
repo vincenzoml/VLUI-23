@@ -7,13 +7,18 @@ async function listItems(path: string) {
 }
 
 function getLayerName(item: string, file: string) {
-    const regex = new RegExp(`${item}_(\\w+)\\..*`)
-    const match = file.match(regex)
+    const regex1 = new RegExp(`${item}_(\\w+)\\..*`)
+    const match1 = file.match(regex1)
 
-    if (match && match[1]) {
-        return match[1]
+    if (match1 && match1[1]) {
+        return match1[1]
+    } else {
+        const regex2 = /(.*).nii(\.gz)?$/
+        const match2 = file.match(regex2)
+        if (match2 && match2[1]) {
+            return match2[1]
+        }
     }
-    return item
 }
 
 // async function resolveLayer(path: string, item: string, layer: string) {

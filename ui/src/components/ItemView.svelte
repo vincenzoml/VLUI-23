@@ -19,7 +19,6 @@
 
 
 	function closeItem(item:Item) {
-		console.log("***************",item.uuid)
 		const newItems = $store.openItems.filter(x => (x.uuid != item.uuid))
 		store.update($st=> ({...$st, openItems: newItems}))
 	}

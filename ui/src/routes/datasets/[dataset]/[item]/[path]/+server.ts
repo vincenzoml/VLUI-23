@@ -1,8 +1,7 @@
-import { json } from 'stream/consumers'
 import { resolveLayer } from '../../../Datasets.js'
 import { promises as fs } from 'fs'
 
-export async function GET(request) {
+export async function GET(request:any) {
 	const filePath = await resolveLayer(request.params.dataset, request.params.item, request.params.path)
 	if (filePath) {
 		const fileContent = Uint8Array.from(await fs.readFile(filePath))
