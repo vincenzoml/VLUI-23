@@ -7,6 +7,7 @@ import axios from 'axios'
 
 import { produce } from "immer"
 
+import { tick } from 'svelte';
 
 export type Layer = {
 	name: string
@@ -27,7 +28,7 @@ type StoreContents = {
 	itemsOfSelectedDataset: string[]
 	openItems: Item[]
 	openLayers: string[]
-	baseImage?: string 
+	baseImage?: string
 }
 
 export type Store = Writable<StoreContents>
@@ -50,20 +51,21 @@ export class State {
 		baseImage: undefined
 	}) // todo: make the public version readonly
 
-	private iup(fn: (st: StoreContents) => void,store=this.store) { store.update($store => produce($store, fn)) }
+	private iup(fn: (st: StoreContents) => void, store = this.store) { store.update($store => produce($store, fn)) }
 
-	layerNames = derived(this.store, ($store) => {
+	private getLayerNames($store: StoreContents) {
 		function layers(item: Item) {
 			return item.layers.map((layer) => layer.name) as string[]
 		}
 		const allLayers = $store.openItems.map(layers)
 		const s = (new Set(allLayers.flat()))
-		if ($store.baseImage) s.delete($store.baseImage)
+		//if ($store.baseImage) s.delete($store.baseImage)
 		return [...new Set(s)]
-	})
+	}
+	layerNames = derived(this.store, this.getLayerNames)
 
-	async setBaseImage(layer:string) {
-		this.iup($store=>{ $store.baseImage=layer })
+	async setBaseImage(layer: string) {
+		this.iup($store => { $store.baseImage = layer })
 	}
 
 	async openItem(dataset: string, item: string) {
@@ -98,8 +100,8 @@ export class State {
 		})
 	}
 
-	constructor() {
+	constructor() {		
 		setContext('store', this.store)
-		setContext('state', this)
+		setContext('state', this)	
 	}
 }
