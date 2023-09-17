@@ -11,16 +11,37 @@
 		Media,
 		MediaContent
 	} from '@smui/card'
-	import { getStore } from './Store'
-	const store = getStore()
+	import { getState } from './Store'
+	import { derived } from 'svelte/store'
+	const state = getState()
+	const store = state.store
 	export let path: string
 	export let item: Item
 	$: path = `/datasets/${item.dataset}/${item.name}/${item.name}_flair.nii.gz`
 
+	const openLayers = derived(store, ($store) => $store.openLayers)
+	const layerNames = state.layerNames
 
-	function closeItem(item:Item) {
-		const newItems = $store.openItems.filter(x => (x.uuid != item.uuid))
-		store.update($st=> ({...$st, openItems: newItems}))
+	let resolvedLayers: string[] = []
+	let preparedLayers: string[] = []
+
+	$: {
+		resolvedLayers = []
+		preparedLayers = []
+		for (const layer of $layerNames) {
+			const itemLayer = item.layers.find((l) => l.name == layer)
+			if (itemLayer) {
+				const isOpen = $openLayers.includes(layer)
+				const res = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
+				if (isOpen) resolvedLayers.push(res)
+				else preparedLayers.push(res)
+			}
+		}
+	}
+
+	function closeItem(item: Item) {
+		const newItems = $store.openItems.filter((x) => x.uuid != item.uuid)
+		store.update(($st) => ({ ...$st, openItems: newItems }))
 	}
 </script>
 
@@ -35,7 +56,12 @@
 				</div>
 				<Media style="padding:6px">
 					<div style="width:300px;height:300px">
-						<Niivue canvasID={item.uuid} src={path} overlays={[]} />						
+						<Niivue
+							canvasID={item.uuid}
+							src={path}
+							overlays={resolvedLayers}
+							prepared={preparedLayers}
+						/>
 					</div>
 				</Media>
 			</div>
@@ -46,7 +72,7 @@
 					</Button>
 				</ActionButtons>
 				<ActionIcons>
-					<IconButton class="material-icons" on:click={()=>closeItem(item)}>delete</IconButton>					
+					<IconButton class="material-icons" on:click={() => closeItem(item)}>delete</IconButton>
 				</ActionIcons>
 			</div>
 		</Card>

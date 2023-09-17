@@ -56,10 +56,15 @@ export async function resolveLayer(dataset: string, item: string, path: string) 
     if (loadedModule) {
         const items = await loadedModule.listItems(`${datasetsPath}/${dataset}`)
         if (items.includes(item)) {
-            const layers = await loadedModule.listLayers(`${datasetsPath}/${dataset}`, item)            
-            const found = layers.find((layer => (layer.path == path)))
+            const layers = await loadedModule.listLayers(`${datasetsPath}/${dataset}`, item)
+            const found = layers.find((layer => (layer.name == path)))            
             if (found) {
-                return `${datasetsPath}/${dataset}/${item}/${path}`
+                return { path: `${datasetsPath}/${dataset}/${item}/${found.path}`, name: found.path }
+            } else {
+                const found2 = layers.find((layer => (layer.path == path)))
+                if (found2) {
+                    return { path: `${datasetsPath}/${dataset}/${item}/${found2.path}`, name: found2.path }
+                }
             }
         }
     }

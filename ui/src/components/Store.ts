@@ -5,7 +5,7 @@ import { derived, writable } from 'svelte/store'
 import { getUID } from '$lib/uniqueId'
 import axios from 'axios'
 
-import {produce} from "immer"
+import { produce } from "immer"
 
 
 export type Layer = {
@@ -21,13 +21,15 @@ export type Item = {
 	layers: Layer[]
 }
 
-export type Store = Writable<{
+type StoreContents = {
 	datasets: string[]
 	selectedDataset?: string
 	itemsOfSelectedDataset: string[]
 	openItems: Item[]
-	openLayers: Record<string,true>
-}>
+	openLayers: string[]
+}
+
+export type Store = Writable<StoreContents>
 
 export function getStore() {
 	// TODO: make this obsolete, by providing the Store object from the State object
@@ -43,7 +45,7 @@ export class State {
 		datasets: [],
 		itemsOfSelectedDataset: [],
 		openItems: [],
-		openLayers: {}
+		openLayers: []
 	}) // todo: make the public version readonly
 
 	layerNames = derived(this.store, ($store) => {
@@ -55,31 +57,39 @@ export class State {
 		return [...new Set(s)]
 	})
 
+	private iup(fn: (st: StoreContents) => void) { this.store.update($store => produce($store, fn)) }
+
 	async openItem(dataset: string, item: string) {
-		const layers = (await axios.get(`/datasets/${dataset}/${item}`)).data as Layer[]
-		this.store.update(($store) => {
-			const newItem = {
-				name: item,
-				dataset: dataset,
-				path: `/${dataset}/${item}`,
-				uuid: getUID(),
-				layers: layers
-			}
-			return { ...$store, openItems: [...$store.openItems, newItem] }
-		})
+		const uuid = getUID();
+		(async () => {
+			const data = (await axios.get(`/datasets/${dataset}/${item}`)).data as Layer[]
+			this.iup($store => {
+				const item = $store.openItems.find((it) => uuid == it.uuid)
+				if (item) {
+					item.layers = data
+				}
+			})
+		})()
+		const newItem = {
+			name: item,
+			dataset: dataset,
+			path: `/${dataset}/${item}`,
+			uuid: uuid,
+			layers: []
+		}
+		this.iup($store => { $store.openItems.push(newItem); return })
 	}
 
-    toggleLayer(layer:string) {
-        this.store.update($store=> 
-            produce($store,$store=>{
-                if ($store.openLayers[layer]) {
-                    delete $store.openLayers[layer]
-                } else {
-                    $store.openLayers[layer]=true
-                }
-            })
-           )
-    }
+	async toggleLayer(layer: string) {
+		this.iup($store => {
+			const idx = $store.openLayers.findIndex((l) => l == layer)
+			if (idx >= 0) {
+				$store.openLayers.splice(idx, 1)
+			} else {
+				$store.openLayers.push(layer)
+			}
+		})
+	}
 
 	constructor() {
 		setContext('store', this.store)
