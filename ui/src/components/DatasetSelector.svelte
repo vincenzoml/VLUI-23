@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getStore } from './Store'
 	import Select, { Option } from '@smui/select'
-
-	const store = getStore()
+	
+	const store = getStore()	
 </script>
 
 <Select style="width:100%" bind:value={$store.selectedDataset} label="dataset" variant="outlined">

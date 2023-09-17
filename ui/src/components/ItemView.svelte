@@ -15,9 +15,16 @@
 	import { derived } from 'svelte/store'
 	const state = getState()
 	const store = state.store
-	export let path: string
 	export let item: Item
-	$: path = `/datasets/${item.dataset}/${item.name}/${item.name}_flair.nii.gz`
+
+	let path : string
+
+	$: if ($store.baseImage) {		
+		const itemLayer = item.layers.find(l=>$store.baseImage==l.name)
+		if (itemLayer) {
+			path = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
+		}
+	}
 
 	const openLayers = derived(store, ($store) => $store.openLayers)
 	const layerNames = state.layerNames

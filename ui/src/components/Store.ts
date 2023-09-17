@@ -27,6 +27,7 @@ type StoreContents = {
 	itemsOfSelectedDataset: string[]
 	openItems: Item[]
 	openLayers: string[]
+	baseImage?: string 
 }
 
 export type Store = Writable<StoreContents>
@@ -45,19 +46,25 @@ export class State {
 		datasets: [],
 		itemsOfSelectedDataset: [],
 		openItems: [],
-		openLayers: []
+		openLayers: [],
+		baseImage: undefined
 	}) // todo: make the public version readonly
+
+	private iup(fn: (st: StoreContents) => void,store=this.store) { store.update($store => produce($store, fn)) }
 
 	layerNames = derived(this.store, ($store) => {
 		function layers(item: Item) {
 			return item.layers.map((layer) => layer.name) as string[]
 		}
 		const allLayers = $store.openItems.map(layers)
-		const s = new Set(allLayers.flat())
+		const s = (new Set(allLayers.flat()))
+		if ($store.baseImage) s.delete($store.baseImage)
 		return [...new Set(s)]
 	})
 
-	private iup(fn: (st: StoreContents) => void) { this.store.update($store => produce($store, fn)) }
+	async setBaseImage(layer:string) {
+		this.iup($store=>{ $store.baseImage=layer })
+	}
 
 	async openItem(dataset: string, item: string) {
 		const uuid = getUID();

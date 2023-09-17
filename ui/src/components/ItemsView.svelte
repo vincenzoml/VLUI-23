@@ -10,7 +10,7 @@
 <div style="display:flex;justify-content: left;flex-wrap: wrap;overflow:auto; height:100%">
 	{#each $store.openItems as item (item.uuid)}
 		<div style="margin: 10px;">
-			<ItemView path={item.path} {item}/>
+			<ItemView {item}/>
 		</div>
 	{/each}
 </div>
