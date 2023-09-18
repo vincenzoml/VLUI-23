@@ -7,7 +7,7 @@ import axios from 'axios'
 
 import { produce } from "immer"
 
-import { tick } from 'svelte';
+import { tick } from 'svelte'
 import type { RgbaColor } from 'svelte-awesome-color-picker'
 
 export type Layer = {
@@ -29,14 +29,13 @@ type StoreContents = {
 	itemsOfSelectedDataset: string[]
 	openItems: Item[]
 	openLayers: string[]
-	layerColors: Record<string,RgbaColor>
+	layerColors: Record<string, RgbaColor>
 	baseImage?: string
 }
 
 export type Store = Writable<StoreContents>
 
 export function getStore() {
-	// TODO: make this obsolete, by providing the Store object from the State object
 	return getContext('store') as Store
 }
 
@@ -71,6 +70,18 @@ export class State {
 		this.iup($store => { $store.baseImage = layer })
 	}
 
+	async setSelectedDataset(dataset: string) {
+		this.iup($store => { $store.selectedDataset = dataset })
+	}
+
+	async setDatasets(datasets: string[]) {
+		this.iup($store => { $store.datasets = datasets })
+	}
+
+	async setItemsOfSelectedDataset(items: string[]) {
+		this.iup($store => { $store.itemsOfSelectedDataset = items })
+	}
+
 	async openItem(dataset: string, item: string) {
 		const uuid = getUID();
 		(async () => {
@@ -81,6 +92,7 @@ export class State {
 					item.layers = data
 				}
 			})
+
 		})()
 		const newItem = {
 			name: item,
@@ -103,8 +115,8 @@ export class State {
 		})
 	}
 
-	constructor() {		
-		setContext('store', this.store)
-		setContext('state', this)	
-	}
+	// constructor() {
+	// 	setContext('store', this.store)
+	// 	setContext('state', this)
+	// }
 }

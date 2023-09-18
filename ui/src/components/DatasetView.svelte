@@ -1,12 +1,10 @@
 <script lang="ts">
 	import {
-		Table,
 		TableBody,
 		TableBodyCell,
 		TableBodyRow,
 		TableHead,
 		TableHeadCell,
-		Button,
 		TableSearch
 	} from 'flowbite-svelte'
 
@@ -25,7 +23,7 @@
 	//https://flowbite-svelte-blocks.vercel.app/application/advanced-tables
 </script>
 
-<div style="height:100%;width:100%;overflow:hidden;user-select: none;">
+<div style="height:100%;width:100%;overflow:auto;user-select: none;">
 	<TableSearch hoverable placeholder="Search by name..." bind:inputValue={searchTerm}>
 		<TableHead><TableHeadCell>Name</TableHeadCell></TableHead>
 			<TableBody>
@@ -39,16 +37,4 @@
 			</TableBody>
 	</TableSearch>
 </div>
-
-<!-- 
-<div
-	style="user-select:none;height:100%;width:100%;padding:0px;overflow:auto;display:flex;flex-direction: column;gap:4px"
->
-	<List>
-		{#each $store.itemsOfSelectedDataset as item}
-			<Item on:SMUI:action={() => state.openItem(dataset, item)}><Text>{item}</Text></Item>
-		{/each}
-	</List>
-</div>
- -->
 
