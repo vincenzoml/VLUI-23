@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Niivue from './Niivue.svelte'
 	import type { Item } from './Store'
-	import { Card, Button, Toggle } from 'flowbite-svelte'
+	import { Card, Dropdown, DropdownItem, Button, Toggle, CloseButton } from 'flowbite-svelte'
+	// import { DotsHorizontalOutline } from 'flowbite-svelte-icons'
 
 	import { getState } from './Store'
 	import { derived } from 'svelte/store'
@@ -48,31 +49,22 @@
 		}
 	}
 
-	function closeItem(item: Item) {
+	function closeItem() {
 		const newItems = $store.openItems.filter((x) => x.uuid != item.uuid)
 		store.update(($st) => ({ ...$st, openItems: newItems }))
 	}
 </script>
 
-<Card>
-	<div>
-		<div style="flex-grow:1;;">
-			<div style="padding:16px 0px 0px 16px;">
-				<h3>{item.name}</h3>
-			</div>
-		</div>
+<Card padding="none">
+	<div style="padding:6px;display:flex;flex-direction:column">
+		<h2 style="padding:10px 0px 16px 0px">
+			{item.name}
+		</h2>
 		<div style="width:300px;height:300px">
 			<Niivue canvasID={item.uuid} src={path} overlays={resolvedLayers} prepared={preparedLayers} />
 		</div>
+		<div class="flex justify-end">
+			<CloseButton on:click={closeItem}/>
+		</div>
 	</div>
-	<!-- <div style="display: flex;align-items: center;justify-content: space-between;">
-				<ActionButtons>
-					<Button>
-						<Label>Run</Label>
-					</Button>
-				</ActionButtons>
-				<ActionIcons>
-					<IconButton class="material-icons" on:click={() => closeItem(item)}>delete</IconButton>
-				</ActionIcons>
-			</div> -->
 </Card>
