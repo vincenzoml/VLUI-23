@@ -1,5 +1,4 @@
 <script lang="ts">
-	//@ts-ignore
 	import { onMount } from 'svelte'
 	import { images } from './ImageCache'
 
@@ -62,29 +61,34 @@
 		let img = await images[overlay]
 		if (img && ((0 == i && src == overlay) || overlays.includes(overlay))) {
 			// FIX for when the image takes a long time to load and the user has deselected the overlay in the meantime
-			if (nv.volumes[i]) {
-				await nv.setVolume(nv.volumes[i],-1)
+			if (nv.volumes[i] && nv.volumes[i].url != overlay) {
+				await nv.setVolume(nv.volumes[i], -1)
 			}
-			const id = nv.getVolumeIndexByID(img.id)			
-			if (id < 0) await nv.addVolume(img)			
-			if (id != i) await nv.setVolume(img, i)
+			if (!nv.volumes[i] || nv.volumes[i].url != overlay) {
+				const id = nv.getVolumeIndexByID(img.id)
+				if (id < 0) await nv.addVolume(img)
+				if (nv.volumes[i] != img) await nv.setVolume(img, i)
+			}
 		}
 	}
 
 	async function updateOverlays() {
-		const installed = nv.volumes.map((vol: any) => vol.url)
-		const close = installed.filter(
-			(layer: string, idx: number) => idx > 0 && !overlays.includes(layer)
-		)
-		for (const cl of close) {
-			const img = await images[cl] // TODO: here we wait if the image is not loaded yet, but in that case, we should just cancel the previous operation
+		const overlayVolumes = nv.volumes.slice(1, nv.volumes.length)
+
+		let close: any[] = []
+		overlayVolumes.forEach((vol: any, i: number) => {
+			if (!overlays.includes(vol.url)) close.push({ cl: vol.url, img: vol })
+		})
+
+		for (const { cl, img } of close) {
+			//const img = await images[cl] // TODO: here we wait if the image is not loaded yet, but in that case, we should just cancel the previous operation
 			const id = nv.getVolumeIndexByID(img.id)
 			if (id >= 0 && !overlays.includes(cl))
 				// FIX for when the image takes a long time to load and the user has re-selected the overlay in the meantime
 				await nv.setVolume(img, -1)
 		}
 
-		let i = 2
+		let i = 1
 		for (const ovl of overlays) {
 			await setOverlay(ovl, i++)
 		}

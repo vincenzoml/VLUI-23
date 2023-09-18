@@ -17,10 +17,10 @@
 	const store = state.store
 	export let item: Item
 
-	let path : string
+	let path: string
 
-	$: if ($store.baseImage) {		
-		const itemLayer = item.layers.find(l=>$store.baseImage==l.name)
+	$: if ($store.baseImage) {
+		const itemLayer = item.layers.find((l) => $store.baseImage == l.name)
 		if (itemLayer) {
 			path = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
 		}
@@ -32,16 +32,26 @@
 	let resolvedLayers: string[] = []
 	let preparedLayers: string[] = []
 
+	// $: {
+	// 	resolvedLayers = []
+	// 	preparedLayers = []
+	// 	for (const layer of $layerNames) {
+	// 		const itemLayer = item.layers.find((l) => l.name == layer)
+	// 		if (itemLayer) {
+	// 			const isOpen = $openLayers.includes(layer)
+	// 			const res = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
+	// 			if (isOpen) resolvedLayers.push(res)
+	// 			else preparedLayers.push(res)
+	// 		}
+	// 	}
+	// }
+
 	$: {
-		resolvedLayers = []
-		preparedLayers = []
-		for (const layer of $layerNames) {
+		resolvedLayers = [] // NOTE THAT THE ORDER OF THE OPEN LAYERS MATTERS, SO THE FOR HAS TO BE ON $OPENLAYERS
+		for (const layer of $openLayers) {
 			const itemLayer = item.layers.find((l) => l.name == layer)
 			if (itemLayer) {
-				const isOpen = $openLayers.includes(layer)
-				const res = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
-				if (isOpen) resolvedLayers.push(res)
-				else preparedLayers.push(res)
+				resolvedLayers.push(`/datasets/${item.dataset}/${item.name}/${itemLayer.path}`)
 			}
 		}
 	}
