@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Select, Listgroup, ListgroupItem } from 'flowbite-svelte'
+	import { Button, Select, Listgroup, ListgroupItem } from 'flowbite-svelte'
 
 	import { getState, getStore } from './Store'
 	// import LayerView from './LayerView.svelte'
@@ -18,6 +18,8 @@
 	$: {
 		if (!selectedBaseImage && $layerNames.length > 0) selectedBaseImage = $layerNames[0]
 	}
+
+	
 </script>
 
 {#if $layerNames.length > 0}
@@ -33,7 +35,15 @@
 
 		<Listgroup style="width:100%">
 			{#each $layerNames.filter((layer) => $store.baseImage != layer) as layer}
-				<ListgroupItem>{layer}</ListgroupItem>
+				<ListgroupItem>
+					<Button						
+						color={$store.openLayers.includes(layer)?'primary':'light'}
+						style="width:100%"
+						on:click={() => {
+							state.toggleLayer(layer)
+						}}>{layer}</Button
+					></ListgroupItem
+				>
 			{/each}
 		</Listgroup>
 	</div>

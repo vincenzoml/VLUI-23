@@ -6,7 +6,7 @@
 
 	import DatasetSelector from '../components/DatasetSelector.svelte'
 	import DatasetView from '../components/DatasetView.svelte'
-	// import ItemsView from '../components/ItemsView.svelte'
+	import ItemsView from '../components/ItemsView.svelte'
 	import LayersView from '../components/LayersView.svelte'
 
 	async function onclick() {
@@ -39,14 +39,13 @@
 	import { Alert } from 'flowbite-svelte'
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
 	style="padding:10px;box-sizing: border-box;display:flex;height:100%;width:100%;overflow:hidden"
 >
 	<div style="display: flex;flex-direction:row;height:100%;width:100%">
 		<LayersView />
 		<div style="flex-grow:1;">
-			<!-- <ItemsView /> -->
+			<ItemsView />
 		</div>
 		<div style="display:flex;flex-direction:column;height:100%">
 			<DatasetSelector />
@@ -54,3 +53,4 @@
 		</div>
 	</div>
 </div>
+
