@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getStore } from './Store'
 	import { Select } from 'flowbite-svelte'
-
 	const store = getStore()
 </script>
 
