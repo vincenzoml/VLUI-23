@@ -41,10 +41,12 @@
 <div
 	style="padding:10px;box-sizing: border-box;display:flex;height:100%;width:100%;overflow:hidden"
 >
-	<div style="min-width: 300px"><LayersView /></div>
-	<div style="flex-grow:1;"><ItemsView /></div> 
-	<div style="display:flex;flex-direction:column;width:300px">
-		<DatasetSelector />
-		<DatasetView />
+	<div style="display: flex;flex-direction:row;height:100%;width:100%">
+		<LayersView />
+		<div style="flex-grow:1;"><ItemsView /></div>
+		<div style="display:flex;flex-direction:column;">
+			<DatasetSelector />
+			<DatasetView />
+		</div>
 	</div>
 </div>

@@ -8,6 +8,7 @@ import axios from 'axios'
 import { produce } from "immer"
 
 import { tick } from 'svelte';
+import type { RgbaColor } from 'svelte-awesome-color-picker'
 
 export type Layer = {
 	name: string
@@ -28,6 +29,7 @@ type StoreContents = {
 	itemsOfSelectedDataset: string[]
 	openItems: Item[]
 	openLayers: string[]
+	layerColors: Record<string,RgbaColor>
 	baseImage?: string
 }
 
@@ -48,6 +50,7 @@ export class State {
 		itemsOfSelectedDataset: [],
 		openItems: [],
 		openLayers: [],
+		layerColors: {},
 		baseImage: undefined
 	}) // todo: make the public version readonly
 

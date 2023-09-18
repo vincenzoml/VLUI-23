@@ -1,24 +1,24 @@
 <script lang="ts">
-	import { derived } from 'svelte/store'
 	import { getState, getStore } from './Store'
-	import { writable } from 'svelte/store'
-	import List, { Item, Separator, Text, Meta } from '@smui/list'
-	import { produce } from 'immer'
+	import LayerView from './LayerView.svelte'
+	import List, { Item, Graphic, Separator, Text, Meta } from '@smui/list'
 	import Select, { Option } from '@smui/select'
-	import { all } from 'axios'
 
 	const state = getState()
 	const store = getStore()
+
 	const layerNames = state.layerNames
 
-	let activeLayers = {} as Record<string, Boolean>
-
-	async function clicked(layerName: string) {
-		activeLayers = { ...activeLayers, [layerName]: !activeLayers[layerName] }
-		state.toggleLayer(layerName)
-	}
+	// let focusedLayers = {} as Record<string, Boolean>
+	// on:focusin={() => focus(layerName, true)}
+	// on:focusout={() => focus(layerName, false)}
+	// style={`border-style: ${focusedLayers[layerName] ? 'dashed' : 'none'}`}
+	// async function focus(layerName: string, status: boolean) {
+	// 	focusedLayers = { ...focusedLayers, [layerName]: status }
+	// }
 
 	let selectedBaseImage = $store.baseImage
+	import Accordion, { Panel, Header, Content } from '@smui-extra/accordion'
 
 	$: (async () => {
 		if (selectedBaseImage) state.setBaseImage(selectedBaseImage)
@@ -30,27 +30,18 @@
 </script>
 
 {#if $layerNames.length > 0}
-	<Select label="Base image" variant="outlined" bind:value={selectedBaseImage}>
-		{#each $layerNames as biCandidate}
-			<Option value={biCandidate}>{biCandidate}</Option>
-		{/each}
-	</Select>
-
-	<List singleSelection>
-		{#each $layerNames.filter((layer) => $store.baseImage != layer) as layerName}
-			<div style="display:flex">
-				<Item ripple={false}
-					activated={activeLayers[layerName] ? true:false}
-					on:SMUI:action={() => clicked(layerName)}
-				>
-					<Text>
-						{layerName}
-					</Text>
-				</Item>
-				<Meta>a</Meta>
-			</div>
-		{/each}
-	</List>
+	<div style="user-select:none; display:flex;flex-direction:column">
+		<Select label="Base image" variant="outlined" bind:value={selectedBaseImage}>
+			{#each $layerNames as biCandidate}
+				<Option value={biCandidate}>{biCandidate}</Option>
+			{/each}
+		</Select>
+		<div class="accordion-container">
+			<Accordion>
+				{#each $layerNames.filter((layer) => $store.baseImage != layer) as layer}
+					<LayerView {layer} />
+				{/each}
+			</Accordion>
+		</div>
+	</div>
 {/if}
-
-

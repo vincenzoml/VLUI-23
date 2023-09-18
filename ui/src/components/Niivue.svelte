@@ -14,17 +14,22 @@
 	import { getStore } from './Store'
 	const store = getStore()
 
-	import Worker from './Worker?worker'
-	let worker: Worker
+	// import Worker from './Worker?worker'
+	// let worker: Worker
+	function delay(ms: number) {
+		return new Promise((resolve) => setTimeout(resolve, ms))
+	}
 
 	function prefetch(overlay: string) {
 		if (!images[overlay]) {
-			images[overlay] = (async () =>
-				NVI.loadFromUrl({
+			images[overlay] = (async () => {
+				await delay(50)
+				return NVI.loadFromUrl({
 					url: overlay,
 					opacity: 0.4,
 					colormap: 'winter'
-				}))()
+				})
+			})()
 		}
 	}
 
@@ -34,15 +39,16 @@
 
 	onMount(async () => {
 		//@ts-ignore
-		const { Niivue, NVImage } = await import('@niivue/niivue')
-		worker = new Worker()
-		worker.onmessage = (msg: any) => {
-			const overlay = msg.overlay
-			const metadata = msg.metadata
-			const buffer = msg.buffer
-		}
+		const { Niivue, NVImage } = await import('../../niivue/src/niivue')
+		// worker = new Worker()
+		// worker.onmessage = (msg: any) => {
+		// 	const overlay = msg.overlay
+		// 	const metadata = msg.metadata
+		// 	const buffer = msg.buffer
+		// }
 
 		NVI = NVImage
+		//@ts-ignore
 		nv = new Niivue({ isResizeCanvas: true })
 		nv.attachTo(canvasID)
 		nv.setSliceType(nv.sliceTypeAxial)
@@ -58,15 +64,19 @@
 
 	async function setOverlay(overlay: string, i: number) {
 		prefetch(overlay)
+		await delay(0)
 		let img = await images[overlay]
 		if (img && ((0 == i && src == overlay) || overlays.includes(overlay))) {
 			// FIX for when the image takes a long time to load and the user has deselected the overlay in the meantime
 			if (nv.volumes[i] && nv.volumes[i].url != overlay) {
+				await delay(0)
 				await nv.setVolume(nv.volumes[i], -1)
 			}
 			if (!nv.volumes[i] || nv.volumes[i].url != overlay) {
 				const id = nv.getVolumeIndexByID(img.id)
+				await delay(0)
 				if (id < 0) await nv.addVolume(img)
+				await delay(0)
 				if (nv.volumes[i] != img) await nv.setVolume(img, i)
 			}
 		}
@@ -104,9 +114,6 @@
 		}
 	}
 
-	$: {
-		if (nv) console.log(nv.volumes)
-	}
 
 	$: if (nv && overlays !== undefined) {
 		try {

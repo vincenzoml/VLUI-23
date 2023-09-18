@@ -9,7 +9,7 @@
 </script>
 
 <div
-	style="height:100%;width:100%;padding:0px;overflow:auto;display:flex;flex-direction: column;gap:4px"
+	style="user-select:none;height:100%;width:100%;padding:0px;overflow:auto;display:flex;flex-direction: column;gap:4px"
 >
 	<List>
 		{#each $store.itemsOfSelectedDataset as item}

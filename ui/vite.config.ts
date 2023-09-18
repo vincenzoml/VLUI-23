@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
-		allow: [""]
+		fs: {
+			allow: ["/workspaces/VLUI-23/ui/niivue"]
+		}
 	}
 });
