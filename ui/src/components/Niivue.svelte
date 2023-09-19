@@ -14,8 +14,7 @@
 
 	let NVI: any
 
-	import { getStore } from './Store'
-	const store = getStore()
+	import { State, getStore } from './Store'
 
 	// import Worker from './Worker?worker'
 	// let worker: Worker
@@ -23,23 +22,45 @@
 		return new Promise((resolve) => setTimeout(resolve, ms))
 	}
 
-	const cmap = {
-		R: [3, 64, 0, 0, 255, 255, 255],
-		G: [0, 0, 0, 255, 255, 192, 3],
-		B: [0, 32, 48, 56, 64, 96, 128],
-		A: [0, 8, 16, 24, 32, 52, 80],
-		I: [0, 32, 64, 96, 160, 192, 255]
+	// const cmap = {
+	// 	R: [3, 64, 0, 0, 255, 255, 255],
+	// 	G: [0, 0, 0, 255, 255, 192, 3],
+	// 	B: [0, 32, 48, 56, 64, 96, 128],
+	// 	A: [0, 8, 16, 24, 32, 52, 80],
+	// 	I: [0, 32, 64, 96, 160, 192, 255]
+	// }
+
+	function stringToRGB(str:string): [number,number,number] {
+		let hash = 0
+		for (let i = 0; i < str.length; i++) {
+			hash = str.charCodeAt(i) + ((hash << 5) - hash)
+		}
+		let r = (hash & 0xff0000) >> 16
+		let g = (hash & 0x00ff00) >> 8
+		let b = hash & 0x0000ff
+		return [r, g, b]
 	}
+
+	function mkCmap(rgb: [number,number,number]) {
+		return {
+			R: [0, rgb[0]],
+			G: [0, rgb[1]],
+			B: [0, rgb[2]],
+			A: [0, 255],
+			I: [0, 255]
+		}
+	}
+
 	function prefetch(overlay: string) {
 		if (!images[overlay]) {
 			images[overlay] = (async () => {
+				nv.addColormap(overlay, mkCmap(stringToRGB(overlay)))
 				await delay(100)
 				return NVI.loadFromUrl({
 					url: overlay,
-					opacity: 0.4,
-					colormap: cmap
+					colormap: overlay
 				})
-			})()
+			})()			
 		}
 	}
 
@@ -69,7 +90,7 @@
 			// }
 		})()
 
-		//nv.addVolumeFromUrl({ url: src })
+		//nv.opts.isColorbar = true
 	})
 
 	async function setOverlay(overlay: string, i: number) {
@@ -115,7 +136,8 @@
 	}
 
 	async function setBaseOverlay(src: string) {
-		setOverlay(src, 0)
+		await setOverlay(src, 0)
+		nv.updateGLVolume()
 	}
 
 	$: {
@@ -131,18 +153,6 @@
 			console.warn('ERROR in update overlays', e)
 		}
 	}
-
-	let canvas: HTMLCanvasElement
-
-	$: {
-		if (canvas) {
-			const ctx = canvas.getContext('gl')
-			canvas.addEventListener('webglcontextlost', (event) => {
-				console.warn('LOST GL CONTEXT')
-				event.preventDefault()
-			})
-		}
-	}
 </script>
 
-<canvas id={canvasID} style="width:100%;aspect-ratio: 1;" bind:this={canvas} />
+<canvas id={canvasID} style="width:100%;aspect-ratio: 1;" />
