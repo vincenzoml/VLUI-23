@@ -1,6 +1,8 @@
 import { setContext, getContext } from 'svelte'
 import type { Writable } from 'svelte/store'
 import { derived, writable } from 'svelte/store'
+import {subStore} from "immer-loves-svelte"
+
 
 import { getUID } from '$lib/uniqueId'
 import axios from 'axios'
@@ -73,6 +75,10 @@ export class State {
 			$store.baseImage = layer
 		})
 	}
+
+	layerColor(layer:string) {
+		return subStore(this.store,($store)=>$store.layerColors[layer])
+	} 
 
 	async setSelectedDataset(dataset: string) {
 		this.iup(($store) => {

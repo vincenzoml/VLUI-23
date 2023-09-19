@@ -1,36 +1,33 @@
 <script lang="ts">
-	import List, { Item, Graphic, Separator, Text, Meta } from '@smui/list'
-	import Accordion, { Panel, Header, Content } from '@smui-extra/accordion'
+	import { Button, ButtonGroup } from 'flowbite-svelte'
+	import { PalleteSolid } from 'flowbite-svelte-icons'
 
 	export let layer: string
-
 	import { getState, getStore } from './Store'
-
 	const state = getState()
 	const store = getStore()
+	import ColorPicker from 'svelte-awesome-color-picker'
+	import type { RgbaColor } from 'svelte-awesome-color-picker'
+	import { writable } from 'svelte/store'
 
-	function togglePalette() {}
+	const rgbStore = state.layerColor(layer)	
 
-	// let focusedLayers = {} as Record<string, Boolean>
-	// on:focusin={() => focus(layerName, true)}
-	// on:focusout={() => focus(layerName, false)}
-	// style={`border-style: ${focusedLayers[layerName] ? 'dashed' : 'none'}`}
-	// async function focus(layerName: string, status: boolean) {
-	// 	focusedLayers = { ...focusedLayers, [layerName]: status }
-	// }
+	$: console.log($store.layerColors)
 </script>
 
-<!-- 
-<Item on:SMUI:action={() => state.toggleLayer(layer)} activated={$store.openLayers.includes(layer)}>
-	<Graphic class="material-icons" aria-hidden="true">palette</Graphic>
-
-	<Text>
-		{layer}
-	</Text>
-</Item> -->
-
-<Panel>
-	<Header>
-		{layer}
-	</Header>
-</Panel>
+<div class="gap-4 flex flex-row place-items-center align-middle w-full">
+	<ButtonGroup class="w-full">
+		<!-- <Button class="w-4" style="background-color: beige;"
+			><PalleteSolid style="color: #FFFF00" /></Button
+		> -->
+		<Button><ColorPicker label="" bind:rgb={$rgbStore} /></Button>
+		<Button
+			class="w-full h-10"
+			size="sm"
+			color={$store.openLayers.includes(layer) ? 'primary' : 'alternative'}
+			on:click={() => {
+				state.toggleLayer(layer)
+			}}>{layer}</Button
+		>
+	</ButtonGroup>
+</div>
