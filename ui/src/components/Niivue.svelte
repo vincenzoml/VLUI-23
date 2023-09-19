@@ -1,5 +1,4 @@
 <script lang="ts">
-	// https://github.com/niivue/niivue/issues/83 (colormaps)
 	// https://niivue.github.io/niivue/devdocs/ (library documentation)
 
 	import { onMount } from 'svelte'
@@ -9,6 +8,9 @@
 	export let overlays: string[] = []
 	export let prepared: string[] = []
 	export let canvasID: string
+
+	import type { RgbaColor } from 'svelte-awesome-color-picker'
+	export let overlayColors: Record<string, RgbaColor> = {}
 
 	let nv: any
 
@@ -23,44 +25,35 @@
 	}
 
 	// const cmap = {
-	// 	R: [3, 64, 0, 0, 255, 255, 255],
+	// 	R: [3, 64, 0, 0, 255, 255, 255], // THE NUMBER OF ELEMENTS OF THE ARRAY ARE THE "SEGMENTS" OF THE COLORMAP!!
 	// 	G: [0, 0, 0, 255, 255, 192, 3],
 	// 	B: [0, 32, 48, 56, 64, 96, 128],
-	// 	A: [0, 8, 16, 24, 32, 52, 80],
+	// 	A: [0, 8, 16, 24, 32, 52, 80], // NO IDEA WHAT A AND I DO; see 	// https://github.com/niivue/niivue/issues/83 (colormaps)
 	// 	I: [0, 32, 64, 96, 160, 192, 255]
 	// }
 
-	function stringToRGB(str:string): [number,number,number] {
-		let hash = 0
-		for (let i = 0; i < str.length; i++) {
-			hash = str.charCodeAt(i) + ((hash << 5) - hash)
+	function mkCmap(rgb: RgbaColor) {
+		const result = {			
+			R: [0, 1, rgb.r],
+			G: [0, 1, rgb.g],
+			B: [0, 1, rgb.b],
+			// A: [0,1, Math.floor(255*rgb.a)],
+			A: [0, 255, 255],
+			I: [0, 1, 255]
 		}
-		let r = (hash & 0xff0000) >> 16
-		let g = (hash & 0x00ff00) >> 8
-		let b = hash & 0x0000ff
-		return [r, g, b]
-	}
 
-	function mkCmap(rgb: [number,number,number]) {
-		return {
-			R: [0, rgb[0]],
-			G: [0, rgb[1]],
-			B: [0, rgb[2]],
-			A: [0, 255],
-			I: [0, 255]
-		}
+		return result
 	}
 
 	function prefetch(overlay: string) {
 		if (!images[overlay]) {
 			images[overlay] = (async () => {
-				nv.addColormap(overlay, mkCmap(stringToRGB(overlay)))
 				await delay(100)
 				return NVI.loadFromUrl({
 					url: overlay,
 					colormap: overlay
 				})
-			})()			
+			})()
 		}
 	}
 
@@ -83,19 +76,31 @@
 		nv = new Niivue({ isResizeCanvas: true })
 		nv.attachTo(canvasID)
 		nv.setSliceType(nv.sliceTypeAxial)
-		;(async () => {
-			if (src) await setOverlay(src, 0)
-			// for (const layer of prepared) {
-			// 	prefetch(layer)
-			// }
-		})()
 
 		//nv.opts.isColorbar = true
 	})
 
+	async function updateOverlayColors(nv: any, overlayColors: Record<string, RgbaColor>) {
+		if (nv) {
+			for (const [index, overlay] of overlays.entries()) {
+				if (overlayColors[overlay]) {
+					const rgb = overlayColors[overlay]
+
+					if (colormapColors[overlay] != rgb) {
+						nv.addColormap(overlay, mkCmap({ ...rgb }))
+						nv.setOpacity(index+1,rgb.a)
+						colormapColors[overlay] = rgb
+						nv.updateGLVolume()
+					}
+				}
+			}
+		}
+	}
+
 	async function setOverlay(overlay: string, i: number) {
 		prefetch(overlay)
 		await delay(0)
+
 		let img = await images[overlay]
 		if (img && ((0 == i && src == overlay) || overlays.includes(overlay))) {
 			// FIX for when the image takes a long time to load and the user has deselected the overlay in the meantime
@@ -105,8 +110,9 @@
 			}
 			if (!nv.volumes[i] || nv.volumes[i].url != overlay) {
 				const id = nv.getVolumeIndexByID(img.id)
-				await delay(0)
-				if (id < 0) await nv.addVolume(img)
+				if (id < 0) {
+					await nv.addVolume(img)
+				}
 				await delay(0)
 				if (nv.volumes[i] != img) await nv.setVolume(img, i)
 			}
@@ -115,7 +121,7 @@
 
 	async function updateOverlays() {
 		const overlayVolumes = nv.volumes.slice(1, nv.volumes.length)
-
+		
 		let close: any[] = []
 		overlayVolumes.forEach((vol: any, i: number) => {
 			if (!overlays.includes(vol.url)) close.push({ cl: vol.url, img: vol })
@@ -135,24 +141,27 @@
 		}
 	}
 
+	
 	async function setBaseOverlay(src: string) {
+		nv.addColormap(src, mkCmap({ r: 255, g: 255, b: 255, a: 1 }))
 		await setOverlay(src, 0)
-		nv.updateGLVolume()
 	}
 
 	$: {
-		if (src && NVI) {
+		if (src && NVI && nv) {
 			setBaseOverlay(src)
 		}
 	}
 
 	$: if (nv && overlays !== undefined) {
 		try {
-			updateOverlays()
+			updateOverlays().then(()=>updateOverlayColors(nv,overlayColors))			
 		} catch (e) {
 			console.warn('ERROR in update overlays', e)
 		}
 	}
+
+	const colormapColors: Record<string, RgbaColor> = {}
 </script>
 
 <canvas id={canvasID} style="width:100%;aspect-ratio: 1;" />

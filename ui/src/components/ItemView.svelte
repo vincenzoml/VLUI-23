@@ -6,6 +6,7 @@
 
 	import { getState } from './Store'
 	import { derived } from 'svelte/store'
+	import type { RgbaColor } from 'svelte-awesome-color-picker'
 	const state = getState()
 	const store = state.store
 	export let item: Item
@@ -20,7 +21,6 @@
 	}
 
 	const openLayers = derived(store, ($store) => $store.openLayers)
-	const layerNames = state.layerNames
 
 	let resolvedLayers: string[] = []
 	let preparedLayers: string[] = []
@@ -39,12 +39,18 @@
 	// 	}
 	// }
 
+	const layerColors=derived(store,($store)=>$store.layerColors)
+
+	const overlayColors: Record<string,RgbaColor> = {}
+
 	$: {
 		resolvedLayers = [] // NOTE THAT THE ORDER OF THE OPEN LAYERS MATTERS, SO THE FOR HAS TO BE ON $OPENLAYERS
 		for (const layer of $openLayers) {
 			const itemLayer = item.layers.find((l) => l.name == layer)
 			if (itemLayer) {
-				resolvedLayers.push(`/datasets/${item.dataset}/${item.name}/${itemLayer.path}`)
+				const path = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
+				resolvedLayers.push(path)
+				if ($layerColors[layer]) overlayColors[path] = $layerColors[layer]
 			}
 		}
 	}
@@ -64,7 +70,7 @@
 			<CloseButton on:click={closeItem} />
 		</div>
 		<div style="width:300px;height:300px">
-			<Niivue canvasID={item.uuid} src={path} overlays={resolvedLayers} prepared={preparedLayers} />
+			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers} prepared={preparedLayers} />
 		</div>
 		<div class="flex">
 			<Button outline style="flex-grow:0">Run</Button>
@@ -72,3 +78,4 @@
 		</div>
 	</div>
 </Card>
+

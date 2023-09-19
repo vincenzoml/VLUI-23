@@ -1,7 +1,7 @@
 import { setContext, getContext } from 'svelte'
 import type { Writable } from 'svelte/store'
 import { derived, writable } from 'svelte/store'
-import {subStore} from "immer-loves-svelte"
+import { subStore } from "immer-loves-svelte"
 
 
 import { getUID } from '$lib/uniqueId'
@@ -76,9 +76,9 @@ export class State {
 		})
 	}
 
-	layerColor(layer:string) {
-		return subStore(this.store,($store)=>$store.layerColors[layer])
-	} 
+	layerColor(layer: string) {
+		return subStore(this.store, ($store) => $store.layerColors[layer])
+	}
 
 	async setSelectedDataset(dataset: string) {
 		this.iup(($store) => {
@@ -100,15 +100,15 @@ export class State {
 
 	async openItem(dataset: string, item: string) {
 		const uuid = getUID()
-		;(async () => {
-			const data = (await axios.get(`/datasets/${dataset}/${item}`)).data as Layer[]
-			this.iup(($store) => {
-				const item = $store.openItems.find((it) => uuid == it.uuid)
-				if (item) {
-					item.layers = data
-				}
-			})
-		})()
+			; (async () => {
+				const data = (await axios.get(`/datasets/${dataset}/${item}`)).data as Layer[]
+				this.iup(($store) => {
+					const item = $store.openItems.find((it) => uuid == it.uuid)
+					if (item) {
+						item.layers = data
+					}
+				})
+			})()
 		const newItem = {
 			name: item,
 			dataset: dataset,
