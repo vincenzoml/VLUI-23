@@ -1,15 +1,13 @@
 <script lang="ts">
-	import MainPage from '../components/MainPage.svelte'
-
 	import axios from 'axios'
 	import { onMount, setContext } from 'svelte'
-	import { State } from '../components/Store'
+	import { State } from './Store'
 	import { derived } from 'svelte/store'
 
-	import DatasetSelector from '../components/DatasetSelector.svelte'
-	import DatasetView from '../components/DatasetView.svelte'
-	import ItemsView from '../components/ItemsView.svelte'
-	import LayersView from '../components/LayersView.svelte'
+	import DatasetSelector from './DatasetSelector.svelte'
+	import DatasetView from './DatasetView.svelte'
+	import ItemsView from './ItemsView.svelte'
+	import LayersView from './LayersView.svelte'
 	import { Button } from 'flowbite-svelte'
 
 	async function onclick() {
@@ -42,7 +40,28 @@
 	})
 
 	$: x = $store.selectedDataset
-	import { CalendarWeekSolid } from 'flowbite-svelte-icons'
 </script>
 
-<MainPage />
+<div class="app" style="display: flex;overflow: hidden;gap:50px">
+	<div style="flex-grow:0">
+		<LayersView />
+	</div>
+
+	<div style="flex-grow:1;">
+		<ItemsView />
+	</div>
+
+	<div style="display:flex;flex-direction:column;height:100%">
+		<DatasetSelector />
+		<DatasetView />
+	</div>
+</div>
+
+<style>
+	.app {
+		padding: 30px;
+		box-sizing: border-box;
+		height: 100%;
+		width: 100%;
+	}
+</style>

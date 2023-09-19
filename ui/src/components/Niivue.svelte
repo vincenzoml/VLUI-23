@@ -1,4 +1,7 @@
 <script lang="ts">
+	// https://github.com/niivue/niivue/issues/83 (colormaps)
+	// https://niivue.github.io/niivue/devdocs/ (library documentation)
+
 	import { onMount } from 'svelte'
 	import { images } from './ImageCache'
 
@@ -20,14 +23,21 @@
 		return new Promise((resolve) => setTimeout(resolve, ms))
 	}
 
+	const cmap = {
+		R: [3, 64, 0, 0, 255, 255, 255],
+		G: [0, 0, 0, 255, 255, 192, 3],
+		B: [0, 32, 48, 56, 64, 96, 128],
+		A: [0, 8, 16, 24, 32, 52, 80],
+		I: [0, 32, 64, 96, 160, 192, 255]
+	}
 	function prefetch(overlay: string) {
 		if (!images[overlay]) {
 			images[overlay] = (async () => {
-				await delay(50)
+				await delay(100)
 				return NVI.loadFromUrl({
 					url: overlay,
 					opacity: 0.4,
-					colormap: 'winter'
+					colormap: cmap
 				})
 			})()
 		}
@@ -114,7 +124,6 @@
 		}
 	}
 
-
 	$: if (nv && overlays !== undefined) {
 		try {
 			updateOverlays()
@@ -123,7 +132,6 @@
 		}
 	}
 
-	// https://niivue.github.io/niivue/devdocs/
 	let canvas: HTMLCanvasElement
 
 	$: {

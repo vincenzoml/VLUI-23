@@ -1,9 +1,9 @@
 type Layer = {
-    name: string
-    path: string
+	name: string
+	path: string
 }
 
 export type DatasetLoader = {
-    listItems(path: string): Promise<string[]>
-    listLayers(path: string, item: string): Promise<Layer[]>;
-} 
+	listItems(path: string): Promise<string[]>
+	listLayers(path: string, item: string): Promise<Layer[]>
+}

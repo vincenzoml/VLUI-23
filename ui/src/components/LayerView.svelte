@@ -31,6 +31,6 @@
 
 <Panel>
 	<Header>
-			{layer}
+		{layer}
 	</Header>
 </Panel>
