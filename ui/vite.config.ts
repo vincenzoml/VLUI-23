@@ -3,9 +3,9 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
 	plugins: [sveltekit()],
-	server: {
+	server: {		
 		fs: {
-			allow: ['/workspaces/VLUI-23/ui/niivue']
+			allow: ['/workspaces/VLUI-23/ui/niivue','/workspaces/VLUI-23/ui']
 		}
 	}
 })

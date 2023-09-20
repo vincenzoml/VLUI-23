@@ -10,9 +10,8 @@
 </script>
 
 <Select
-	style="width:100%"
+	class="w-full"	
 	underline
-	size="lg"
 	{value}
 	on:change={(e) => state.setSelectedDataset(e.target.value)}
 	items={$store.datasets.map((dataset) => ({ name: dataset, value: dataset }))}

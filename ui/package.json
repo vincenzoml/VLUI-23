@@ -34,11 +34,14 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@codemirror/lang-javascript": "^6.2.1",
 		"axios": "^1.5.0",
 		"flowbite-svelte-icons": "^0.4.4",
 		"immer": "^10.0.2",
 		"immer-loves-svelte": "^2.2.4",
+		"monaco-editor": "^0.43.0",
 		"svelte-awesome-color-picker": "^2.4.7",
+		"svelte-codemirror-editor": "^1.1.0",
 		"uuid": "^9.0.1"
 	}
 }

@@ -69,8 +69,8 @@
 			</h2>
 			<CloseButton on:click={closeItem} />
 		</div>
-		<div style="width:300px;height:300px">
-			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers} prepared={preparedLayers} />
+		<div style="width:100%;aspect-ratio:1">
+			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers} prepared={preparedLayers}/>
 		</div>
 		<div class="flex">
 			<Button outline style="flex-grow:0">Run</Button>

@@ -164,4 +164,4 @@
 	const colormapColors: Record<string, RgbaColor> = {}
 </script>
 
-<canvas id={canvasID} style="width:100%;aspect-ratio: 1;" />
+<canvas id={canvasID} style="width:100%;height:100" />

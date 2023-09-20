@@ -55,10 +55,7 @@
 
 <div class="gap-4 flex flex-row place-items-center align-middle w-full">
 	<ButtonGroup class="w-full">
-		<!-- <Button class="w-4" style="background-color: beige;"
-			><PalleteSolid style="color: #FFFF00" /></Button
-		> -->
-		<Button style={`background-color: #909090`}>
+		<Button class="w-12" style={`background-color: #909090`}>
 			<ColorPicker bind:isDark label="" bind:rgb={$rgbStore} />
 		</Button>
 		<Button

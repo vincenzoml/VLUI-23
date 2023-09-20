@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ItemView from './ItemView.svelte'
 	import { getStore } from './Store'
-	const store = getStore()
+	const store = getStore()	
 </script>
 
 <div style="display:flex;justify-content: left;flex-wrap: wrap;overflow:auto; height:100%">

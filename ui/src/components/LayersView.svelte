@@ -21,11 +21,12 @@
 
 </script>
 
-<div class="w-48 select-none flex flex-col gap-3">
-	<Select
+{#if $layerNames.length > 0}
+<div class="w-full select-none flex flex-col gap-3">
+	<Select class="w-full"
 		placeholder="base image (open cases first)"
 		underline
-		size="lg"
+		size="md"
 		items={$layerNames.map((layer) => ({ name: layer, value: layer }))}
 		label="Base image"
 		variant="outlined"
@@ -36,3 +37,4 @@
 		<LayerView {layer} />
 	{/each}
 </div>
+{/if}
