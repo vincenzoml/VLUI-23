@@ -39,9 +39,9 @@
 	// 	}
 	// }
 
-	const layerColors = derived(store, ($store) => $store.layerColors)
+	const layerColors=derived(store,($store)=>$store.layerColors)
 
-	const overlayColors: Record<string, RgbaColor> = {}
+	const overlayColors: Record<string,RgbaColor> = {}
 
 	$: {
 		resolvedLayers = [] // NOTE THAT THE ORDER OF THE OPEN LAYERS MATTERS, SO THE FOR HAS TO BE ON $OPENLAYERS
@@ -61,24 +61,21 @@
 	}
 </script>
 
-<div class="w-full" >
-	<div class="w-full shadow-md border-1 bg-slate-50" style="border-radius: 10px;">
-		<div style="padding:10px;display:flex;flex-direction:column;gap:20px:width:100%">
-			<div style="display:flex;justify-content: space-between;align-items: baseline;width:100%">
-				<h2 style="flex-grow:1;padding:10px 0px 16px 0px;overflow-wrap: break-word;width:100%">
-					{item.name}
-				</h2>
-				<CloseButton on:click={closeItem} />
-			</div>
-			<div style="width:100%;aspect-ratio:1">
-				<Niivue
-					canvasID={item.uuid}
-					src={path}
-					{overlayColors}
-					overlays={resolvedLayers}
-					prepared={preparedLayers}
-				/>
-			</div>
+<Card padding="none">
+	<div style="padding:10px;display:flex;flex-direction:column;gap:10px;width:100%">
+		<div style="display:flex;justify-content: space-between;align-items: baseline;">
+			<h2 style="padding:10px 0px 16px 0px">
+				{item.name}
+			</h2>
+			<CloseButton on:click={closeItem} />
+		</div>
+		<div style="width:100%;aspect-ratio:1">
+			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers} prepared={preparedLayers}/>
+		</div>
+		<div class="flex">
+			<Button outline style="flex-grow:0">Run</Button>
+			<div style="flex-grow:1" />
 		</div>
 	</div>
-</div>
+</Card>
+
