@@ -60,7 +60,7 @@
 	let specVisible = true
 	let layersVisible = true
 	let itemsVisible = true
-	let zoomlevel = 3
+	let fit = 2
 
 	function toggleDataset() {
 		datasetVisible = !datasetVisible
@@ -81,16 +81,16 @@
 	}
 
 	function zoomIn() {
-		if (zoomlevel <5) zoomlevel ++
+		if (fit > 1) fit --
 	}
 
 	function zoomOut() {
-		if (zoomlevel > 1) zoomlevel --
+		if (fit < 5) fit ++
 	}
 
 </script>
 
-<div class="flex gap-0 w-full h-screen overflow-hidden p-2">
+<div class="flex gap-0 p-2 overflow-hidden w-screen h-screen">
 	<div class="h-full flex-grow-0 flex flex-col gap-2 p-2">
 		<ToolbarButton on:click={toggleDataset}>
 			<BarsSolid />
@@ -127,7 +127,7 @@
 
 		{#if itemsVisible}
 			<div class="flex-grow w-full">
-				<ItemsView/>
+				<ItemsView bind:fit/>
 			</div>
 		{/if}
 
