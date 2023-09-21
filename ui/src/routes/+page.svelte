@@ -29,5 +29,4 @@
 
 </script>
 
-AA
-<!-- <MainPage /> -->
+<MainPage />

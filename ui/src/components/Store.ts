@@ -10,7 +10,6 @@ import axios from 'axios'
 import { produce } from 'immer'
 
 import type { RgbaColor } from 'svelte-awesome-color-picker'
-import { $ } from 'execa'
 
 export type Layer = {
 	name: string
