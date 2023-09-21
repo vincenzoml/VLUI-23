@@ -45,14 +45,14 @@ export async function POST({ request }) {
 
 	const uuid = getUUID()
 	const dirName = `./results/${uuid}`
-	await fs.mkdir(dirName)
+	await fs.mkdir(dirName, { recursive: true })
 	const specificationPath = `${dirName}/specification.imgql`
 	await fs.writeFile(specificationPath, resolvedSpec)
 
 	let stdout: string = '{ error: "Unknown error"; log: "" }'
 	// Read from the pipe using the executable
 	try {
-		const vlresult = await execa(voxlogica, ['--json', specificationPath])
+		const vlresult = await execa(voxlogica, ['--json', 'specification.imgql'], { cwd: dirName })
 		stdout = vlresult.stdout
 
 	} catch (e: any) {
@@ -60,8 +60,12 @@ export async function POST({ request }) {
 		stdout = e.stdout
 	}
 
+
 	const result = JSON.parse(stdout)
 
-	const response = json({uuid: uuid,results: [{ output: result, item: data.items[0] }]}) // The source code of the "json" function is very helpful
-	return response
+
+
+	const response = { uuid: uuid, results: [{ output: result, item: data.items[0] }] }
+	await fs.writeFile(`${dirName}/response.json`, JSON.stringify(response))
+	return json(response) // The source code of the "json" function is very helpful
 }
