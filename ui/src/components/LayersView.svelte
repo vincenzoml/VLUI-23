@@ -22,7 +22,7 @@
 </script>
 
 {#if $layers.length > 0 && $layers[0].names.length > 0}
-	<div class="max-w-min h-full select-none flex flex-col gap-3 overflow-auto">
+	<div class="w-72 min-w-min h-full select-none flex flex-col justify-start gap-3 overflow-auto">
 		<Select
 			class="w-full"
 			placeholder="base image (open cases first)"
@@ -36,11 +36,11 @@
 
 		{#each $layers as layerGroup}
 			<Label>{layerGroup.provenance.split('/').pop()}</Label>
-			<div class="max-w-min h-full select-none flex flex-col gap-3">
+			<!-- <div class="max-w-min h-full select-none flex flex-col gap-3 justify-start"> -->
 				{#each layerGroup.names.filter((layer) => $store.baseImage != layer) as layer}
 					<LayerView provenance={layerGroup.provenance} {layer} />
 				{/each}
-			</div>
+			<!-- </div> -->
 			<hr />
 		{/each}
 	</div>

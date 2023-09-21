@@ -126,10 +126,10 @@
 				<LayersView />
 			</div>
 		{/if}
-
+<!-- 
 		<div>
 			{JSON.stringify($store.openLayers)}
-		</div>
+		</div> -->
 
 		{#if itemsVisible}
 			<div class="flex-grow w-full">

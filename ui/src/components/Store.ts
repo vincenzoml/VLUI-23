@@ -32,7 +32,8 @@ export type ServerItem = {
 export type Result = {
 	output: {
 		layers: {
-			name: string
+			name: string,
+			extension: string
 		}[]
 	},
 	item: ServerItem
@@ -81,7 +82,7 @@ export function getState() {
 	return getContext('state') as State
 }
 
-function layerKey(provenance: string, name: string) {
+export function layerKey(provenance: string, name: string) {
 	return `${provenance}/${name}`
 }
 export class State {
@@ -152,8 +153,8 @@ export class State {
 		})
 	}
 
-	layerColor(layer: string) {
-		return subStore(this.store, ($store) => $store.layerColors[layer])
+	layerColor(provenance: string, name: string) {
+		return subStore(this.store, ($store) => $store.layerColors[layerKey(provenance,name)])
 	}
 
 	specification = subStore(this.store, ($store) => $store.specification)
@@ -180,6 +181,7 @@ export class State {
 		const response = await internal_run(item, specification)
 		if (response) {
 			this.iup($store => { $store.responses.push(response) })
+			this.updateItemLayersFromResults()
 		}
 	}
 
@@ -194,6 +196,22 @@ export class State {
 	// 		}
 	// 	}
 	// })
+
+	private updateItemLayersFromResults() {
+		this.iup($store=>{
+			for (const item of $store.openItems) {
+				for (const response of $store.responses) { // TODO: this is not efficient, the data structures should be improved; items should be referenced in openItems, not repeated
+					for (const result of response.results) {
+						if (result.item.dataset==item.dataset && result.item.name==item.name) {
+							for (const layer of result.output.layers) {
+								item.layers.push({name: layer.name,path: layer.name+layer.extension})
+							}
+						}
+					}
+				}
+			}
+		})
+	}
 
 	async openItem(dataset: string, item: string) {
 		const uuid = getUUID()
@@ -213,10 +231,12 @@ export class State {
 			uuid: uuid,
 			layers: []
 		}
+
 		this.iup(($store) => {
 			$store.openItems.push(newItem)
 			return
 		})
+		this.updateItemLayersFromResults()
 	}
 
 	async toggleLayer(provenance: string, name: string) {

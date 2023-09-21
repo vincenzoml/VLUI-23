@@ -4,7 +4,7 @@
 	import { Card, Dropdown, DropdownItem, Button, Toggle, CloseButton } from 'flowbite-svelte'
 	// import { DotsHorizontalOutline } from 'flowbite-svelte-icons'
 
-	import { getState } from './Store'
+	import { getState,layerKey } from './Store'
 	import { derived } from 'svelte/store'
 	import type { RgbaColor } from 'svelte-awesome-color-picker'
 	import axios from 'axios'
@@ -51,7 +51,8 @@
 			if (itemLayer) {
 				const path = `${layer.provenance}/${item.dataset}/${item.name}/${itemLayer.path}`
 				resolvedLayers.push(path)
-				if ($layerColors[layer.name]) overlayColors[path] = $layerColors[layer.name]
+				const key = layerKey(layer.provenance,layer.name)
+				if ($layerColors[key]) overlayColors[path] = $layerColors[key]
 			}
 		}
 	}

@@ -11,7 +11,7 @@
 	import type { RgbaColor } from 'svelte-awesome-color-picker'
 	import { writable } from 'svelte/store'
 
-	const rgbStore = state.layerColor(layer)
+	const rgbStore = state.layerColor(provenance,layer)
 	let isDark: boolean
 
 	async function hash(input: ArrayBuffer | string) {
@@ -55,7 +55,7 @@
 </script>
 
 <div class="gap-4 flex flex-row place-items-center align-middle w-full">
-	<ButtonGroup class="w-full">
+	<ButtonGroup class="w-36">
 		<Button class="w-12" style={`background-color: #909090`}>
 			<ColorPicker bind:isDark label="" bind:rgb={$rgbStore} />
 		</Button>
@@ -68,4 +68,5 @@
 			}}>{layer}</Button
 		>
 	</ButtonGroup>
+	{[provenance,layer]}
 </div>

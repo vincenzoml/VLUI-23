@@ -2,4 +2,4 @@ let img = intensity($flair)
 
 print "volume" volume(img>.0)
 
-save "output.nii.gz" img
+save "output.nii.gz" img >. 700
