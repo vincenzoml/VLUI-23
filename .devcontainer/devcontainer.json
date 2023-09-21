@@ -21,7 +21,8 @@
         "ms-toolsai.jupyter",
         "svelte.svelte-vscode",
         "ms-azuretools.vscode-docker",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "bradlc.vscode-tailwindcss"
       ]
     }
   },

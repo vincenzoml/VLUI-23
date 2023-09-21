@@ -1,4 +1,4 @@
-import { listItems } from '../Datasets.js'
+import { listItems } from '../Datasets'
 
 export async function GET(request) {
 	const items = await listItems(request.params.dataset)

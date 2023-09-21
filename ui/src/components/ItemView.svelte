@@ -7,6 +7,7 @@
 	import { getState } from './Store'
 	import { derived } from 'svelte/store'
 	import type { RgbaColor } from 'svelte-awesome-color-picker'
+	import axios from 'axios'
 	const state = getState()
 	const store = state.store
 	export let item: Item
@@ -59,10 +60,22 @@
 		const newItems = $store.openItems.filter((x) => x.uuid != item.uuid)
 		store.update(($st) => ({ ...$st, openItems: newItems }))
 	}
+
+	const specification=state.specification
+
+	async function run() {
+		const response = await axios.post('/run', {
+			specification: $specification,
+			items: [{ name: item.name, dataset: item.dataset }]
+		})
+		const result = JSON.parse(response.data)
+		console.log(result.log)
+	}
+
 </script>
 
 <Card padding="none">
-	<div style="padding:10px;display:flex;flex-direction:column;gap:10px;width:100%">
+	<div class="flex flex-col p-2 gap-2 w-full">
 		<div style="display:flex;justify-content: space-between;align-items: baseline;">
 			<h2 style="padding:10px 0px 16px 0px">
 				{item.name}
@@ -73,8 +86,8 @@
 			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers} prepared={preparedLayers}/>
 		</div>
 		<div class="flex">
-			<Button outline style="flex-grow:0">Run</Button>
 			<div style="flex-grow:1" />
+			<Button outline style="flex-grow:0" on:click={run}>Run</Button>			
 		</div>
 	</div>
 </Card>

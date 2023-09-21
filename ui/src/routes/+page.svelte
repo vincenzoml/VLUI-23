@@ -6,20 +6,6 @@
 	import { State } from '../components/Store'
 	import { derived } from 'svelte/store'
 
-	import DatasetSelector from '../components/DatasetSelector.svelte'
-	import DatasetView from '../components/DatasetView.svelte'
-	import ItemsView from '../components/ItemsView.svelte'
-	import LayersView from '../components/LayersView.svelte'
-	import { Button } from 'flowbite-svelte'
-
-	async function onclick() {
-		const response = await axios.post('/run', {
-			specification: 'print "Hello, world!" "ciao"',
-			items: []
-		})
-		const result = JSON.parse(response.data)
-	}
-
 	const state = new State()
 	const store = state.store
 	setContext('store', store)
@@ -41,8 +27,6 @@
 		}, 200)
 	})
 
-	$: x = $store.selectedDataset
-	import { CalendarWeekSolid } from 'flowbite-svelte-icons'
 </script>
 
 <MainPage />

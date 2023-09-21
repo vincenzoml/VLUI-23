@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs'
 import { listSubdirs } from './Util'
 import type { DatasetLoader } from './DatasetLoader'
-import { send } from 'vite'
 
 const basePath = '/home/VoxLogicA'
 const datasetsPath = `${basePath}/datasets`
@@ -51,7 +50,12 @@ export async function listLayers(dataset: string, item: string) {
 	}
 }
 
-export async function resolveLayer(dataset: string, item: string, path: string) {
+export type Layer = {
+	path: string
+	name: string
+}
+
+export async function resolveLayer(dataset: string, item: string, path: string): Promise<Layer | undefined> {
 	const loadedModule = await getLoader(dataset)
 	if (loadedModule) {
 		const items = await loadedModule.listItems(`${datasetsPath}/${dataset}`)

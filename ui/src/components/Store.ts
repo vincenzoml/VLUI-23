@@ -32,7 +32,8 @@ type StoreContents = {
 	openItems: Item[]
 	openLayers: string[]
 	layerColors: Record<string, RgbaColor>
-	baseImage?: string
+	baseImage?: string,
+	specification: string
 }
 
 export type Store = Writable<StoreContents>
@@ -52,7 +53,8 @@ export class State {
 		openItems: [],
 		openLayers: [],
 		layerColors: {},
-		baseImage: undefined
+		baseImage: undefined,
+		specification: ""
 	}) // todo: make the public version readonly
 
 	private iup(fn: (st: StoreContents) => void, store = this.store) {
@@ -79,6 +81,8 @@ export class State {
 	layerColor(layer: string) {
 		return subStore(this.store, ($store) => $store.layerColors[layer])
 	}
+
+	specification = subStore(this.store,($store)=>$store.specification)
 
 	async setSelectedDataset(dataset: string) {
 		this.iup(($store) => {
