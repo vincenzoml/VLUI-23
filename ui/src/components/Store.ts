@@ -48,11 +48,11 @@ async function internal_run(item: Item, specification: string) {
 		specification: specification,
 		items: [{ name: item.name, dataset: item.dataset }]
 	})
-	
+
 	if (response.data.error && response.data.error != '') { // TODO: if log is empty, signal error anyway; also: signal error in the output of the function
-		console.log("Error\n", response.data.log) 
+		console.log("Error\n", response.data.log)
 	} else {
-		for (const { output, item } of response.data.results) {
+		for (const { output } of response.data.results) {
 			console.log(output.log)
 		}
 		return { uuid: response.data.uuid, results: response.data.results }
@@ -68,7 +68,7 @@ type StoreContents = {
 	layerColors: Record<string, RgbaColor>
 	baseImage?: string,
 	specification: string,
-	responses: Record<string, Response> // Key is uuid returned from server's Run([items])
+	responses: Response[] // Key is uuid returned from server's Run([items])
 }
 
 export type Store = Writable<StoreContents>
@@ -90,14 +90,14 @@ export class State {
 		layerColors: {},
 		baseImage: undefined,
 		specification: "",
-		responses: {}
+		responses: []
 	}) // todo: make the public version readonly
 
 	private iup(fn: (st: StoreContents) => void, store = this.store) {
 		store.update(($store) => produce($store, fn))
 	}
 
-	private getLayers($store: StoreContents): Record<string,string[]> {
+	private getLayers($store: StoreContents): { provenance: string, names: string[] }[] {
 		function layers(items: Item[]) {
 			return items.map((item) => item.layers.map(layer => ({ provenance: `/datasets/${item.dataset}`, name: layer.name }))).flat()
 		}
@@ -115,7 +115,7 @@ export class State {
 		}
 
 		function unique(l: { provenance: string, name: string }[]) {
-			const tmp = {} as Record<string,{ provenance: string, name: string }>
+			const tmp = {} as Record<string, { provenance: string, name: string }>
 			for (const provName of l) {
 				const k = key(provName)
 				if (!(k in tmp)) tmp[k] = provName
@@ -123,21 +123,27 @@ export class State {
 			return Object.values(tmp)
 		}
 
-		const uniques = unique(layers($store.openItems))
-		for (const [uuid,response] of Object.entries($store.responses)) {
-			uniques.concat(unique(responseLayers(response)))
+		let uniques = unique(layers($store.openItems))
+
+		for (const response of $store.responses) {
+			uniques = uniques.concat(unique(responseLayers(response)))
 		}
 
-		const tmp : Record<string,string[]> = {}
+		const tmp: Record<string, string[]> = {}
+		const provenances: string[] = [] // Used to record the order of provenances!
+
 		for (const unique of uniques) {
 			if (unique.provenance in tmp) tmp[unique.provenance].push(unique.name)
-			else tmp[unique.provenance] = [unique.name]
+			else {
+				tmp[unique.provenance] = [unique.name]
+				provenances.push(unique.provenance)
+			}
 		}
 		
-		return tmp
+		return provenances.map((provenance) => ({ provenance: provenance, names: tmp[provenance] }))
 	}
 
-	layerNames = derived(this.store, this.getLayers)
+	$getLayers = derived(this.store, this.getLayers)
 
 	async setBaseImage(layer: string) {
 		this.iup(($store) => {
@@ -169,8 +175,11 @@ export class State {
 		})
 	}
 
-	async run(item: Item,specification: string) {
-		console.log(internal_run(item,specification))
+	async run(item: Item, specification: string) {
+		const response = await internal_run(item, specification)
+		if (response) {
+			this.iup($store => { $store.responses.push(response) })
+		}
 	}
 
 
