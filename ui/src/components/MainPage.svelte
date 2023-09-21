@@ -106,12 +106,12 @@
 		<ToolbarButton on:click={toggleSpec}>
 			<FileLinesSolid />
 		</ToolbarButton>
-		<ToolbarButton on:click={zoomIn}>
+		<!-- <ToolbarButton on:click={zoomIn}>
 			<ZoomInSolid />
 		</ToolbarButton>
 		<ToolbarButton on:click={zoomOut}>
 			<ZoomOutSolid />
-		</ToolbarButton>
+		</ToolbarButton> -->
 	</div>
 	<div class="flex gap-6 w-full flex-grow-1 p-2">
 		{#if datasetVisible && $store.datasets.length>0}
@@ -126,6 +126,10 @@
 				<LayersView />
 			</div>
 		{/if}
+
+		<div>
+			{JSON.stringify($store.openLayers)}
+		</div>
 
 		{#if itemsVisible}
 			<div class="flex-grow w-full">

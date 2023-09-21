@@ -2,6 +2,7 @@
 	import { Button, ButtonGroup } from 'flowbite-svelte'
 	import { PalleteSolid } from 'flowbite-svelte-icons'
 
+	export let provenance: string
 	export let layer: string
 	import { getState, getStore } from './Store'
 	const state = getState()
@@ -61,9 +62,9 @@
 		<Button
 			class="w-full h-10"
 			size="sm"
-			color={$store.openLayers.includes(layer) ? 'primary' : 'alternative'}
+			color={$store.openLayers.some((openLayer)=> openLayer.provenance == provenance && openLayer.name == layer) ? 'primary' : 'alternative'}
 			on:click={() => {
-				state.toggleLayer(layer)
+				state.toggleLayer(provenance,layer)
 			}}>{layer}</Button
 		>
 	</ButtonGroup>

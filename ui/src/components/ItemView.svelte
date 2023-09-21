@@ -47,11 +47,11 @@
 	$: {
 		resolvedLayers = [] // NOTE THAT THE ORDER OF THE OPEN LAYERS MATTERS, SO THE FOR HAS TO BE ON $OPENLAYERS
 		for (const layer of $openLayers) {
-			const itemLayer = item.layers.find((l) => l.name == layer)
+			const itemLayer = item.layers.find((l) => l.name == layer.name)
 			if (itemLayer) {
-				const path = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
+				const path = `${layer.provenance}/${item.dataset}/${item.name}/${itemLayer.path}`
 				resolvedLayers.push(path)
-				if ($layerColors[layer]) overlayColors[path] = $layerColors[layer]
+				if ($layerColors[layer.name]) overlayColors[path] = $layerColors[layer.name]
 			}
 		}
 	}
@@ -64,7 +64,7 @@
 	const specification=state.specification
 </script>
 
-<Card padding="none" class="min-w-max">
+<Card padding="none" class="w-max" >
 	<div class="flex flex-col p-2 gap-2 w-full">
 		<div style="display:flex;justify-content: space-between;align-items: baseline;">
 			<h2 style="padding:10px 0px 16px 0px">

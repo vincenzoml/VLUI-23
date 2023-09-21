@@ -13,7 +13,7 @@ import type { RgbaColor } from 'svelte-awesome-color-picker'
 
 export type Layer = {
 	name: string
-	path: string
+	path: string // THIS IS RELATIVE TO AN ITEM, WHERAS "PROVENANCE" IS GLOBAL
 }
 
 export type Item = {
@@ -64,7 +64,7 @@ type StoreContents = {
 	selectedDataset?: string
 	itemsOfSelectedDataset: string[]
 	openItems: Item[]
-	openLayers: string[]
+	openLayers: { name: string, provenance: string }[]
 	layerColors: Record<string, RgbaColor>
 	baseImage?: string,
 	specification: string,
@@ -81,6 +81,9 @@ export function getState() {
 	return getContext('state') as State
 }
 
+function layerKey(provenance: string, name: string) {
+	return `${provenance}/${name}`
+}
 export class State {
 	store: Store = writable({
 		datasets: [],
@@ -99,7 +102,7 @@ export class State {
 
 	private getLayers($store: StoreContents): { provenance: string, names: string[] }[] {
 		function layers(items: Item[]) {
-			return items.map((item) => item.layers.map(layer => ({ provenance: `/datasets/${item.dataset}`, name: layer.name }))).flat()
+			return items.map((item) => item.layers.map(layer => ({ provenance: `/datasets`, name: layer.name }))).flat()
 		}
 
 		function responseLayers(response: Response) {
@@ -110,14 +113,12 @@ export class State {
 			return layersProvenance.flat()
 		}
 
-		function key(x: { provenance: string; name: string }) {
-			return `${x.provenance}/${x.name}`
-		}
+
 
 		function unique(l: { provenance: string, name: string }[]) {
 			const tmp = {} as Record<string, { provenance: string, name: string }>
 			for (const provName of l) {
-				const k = key(provName)
+				const k = layerKey(provName.provenance, provName.name)
 				if (!(k in tmp)) tmp[k] = provName
 			}
 			return Object.values(tmp)
@@ -139,7 +140,7 @@ export class State {
 				provenances.push(unique.provenance)
 			}
 		}
-		
+
 		return provenances.map((provenance) => ({ provenance: provenance, names: tmp[provenance] }))
 	}
 
@@ -218,13 +219,13 @@ export class State {
 		})
 	}
 
-	async toggleLayer(layer: string) {
+	async toggleLayer(provenance: string, name: string) {
 		this.iup(($store) => {
-			const idx = $store.openLayers.findIndex((l) => l == layer)
+			const idx = $store.openLayers.findIndex((l) => l.provenance == provenance && l.name == name)
 			if (idx >= 0) {
 				$store.openLayers.splice(idx, 1)
 			} else {
-				$store.openLayers.push(layer)
+				$store.openLayers.push({ name: name, provenance: provenance })
 			}
 		})
 	}
