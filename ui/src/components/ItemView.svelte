@@ -64,7 +64,7 @@
 	const specification=state.specification
 </script>
 
-<Card padding="none">
+<Card padding="none" class="min-w-max">
 	<div class="flex flex-col p-2 gap-2 w-full">
 		<div style="display:flex;justify-content: space-between;align-items: baseline;">
 			<h2 style="padding:10px 0px 16px 0px">
@@ -72,7 +72,7 @@
 			</h2>
 			<CloseButton on:click={closeItem} />
 		</div>
-		<div style="width:100%;aspect-ratio:1">
+		<div style="width:300px;aspect-ratio:1">
 			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers} prepared={preparedLayers}/>
 		</div>
 		<div class="flex">

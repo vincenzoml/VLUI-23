@@ -69,7 +69,7 @@
 	}
 
 	function toggleLayers() {
-		if ($layerNames && $layerNames.length > 0) {
+		if ($layerNames && $layerNames[0].length > 0) {
 			layersVisible = !layersVisible
 		}
 	}
@@ -121,11 +121,11 @@
 			</div>
 		{/if}
 
-		{#if layersVisible}
+		<!-- {#if layersVisible}
 			<div class="flex-grow-0">
 				<LayersView />
 			</div>
-		{/if}
+		{/if} -->
 
 		{#if itemsVisible}
 			<div class="flex-grow w-full">

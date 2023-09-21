@@ -44,7 +44,7 @@ export async function POST({ request }) {
 	const resolvedSpec = substitute(concatSpec, Object.keys(resolvedVars).map((x) => x.substring(1)))
 
 	const uuid = getUUID()
-	const dirName = `./results/${uuid}`
+	const dirName = `./results/${uuid}/${data.items[0].dataset}/${data.items[0].name}`
 	await fs.mkdir(dirName, { recursive: true })
 	const specificationPath = `${dirName}/specification.imgql`
 	await fs.writeFile(specificationPath, resolvedSpec)
@@ -62,8 +62,6 @@ export async function POST({ request }) {
 
 
 	const result = JSON.parse(stdout)
-
-
 
 	const response = { uuid: uuid, results: [{ output: result, item: data.items[0] }] }
 	await fs.writeFile(`${dirName}/response.json`, JSON.stringify(response))
