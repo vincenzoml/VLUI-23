@@ -10,6 +10,7 @@ import axios from 'axios'
 import { produce } from 'immer'
 
 import type { RgbaColor } from 'svelte-awesome-color-picker'
+import { $ } from 'execa'
 
 export type Layer = {
 	name: string
@@ -24,9 +25,39 @@ export type Item = {
 	layers: Layer[]
 }
 
-export type Result = { // THIS TYPE SHOULD BE SHARED WITH THE SERVER
-	item: { name: string, dataset: string },
-	output: any
+export type ServerItem = {
+	name: string
+	dataset: string
+}
+
+export type Result = {
+	output: {
+		layers: {
+			name: string
+		}[]
+	},
+	item: ServerItem
+}
+
+export type Response = { // TODO: THIS TYPE SHOULD BE SHARED WITH THE SERVER
+	uuid: string,
+	results: Result[]
+}
+
+async function internal_run(item: Item, specification: string) {
+	const response = await axios.post('/run', {
+		specification: specification,
+		items: [{ name: item.name, dataset: item.dataset }]
+	})
+	
+	if (response.data.error && response.data.error != '') { // TODO: if log is empty, signal error anyway; also: signal error in the output of the function
+		console.log("Error\n", response.data.log) 
+	} else {
+		for (const { output, item } of response.data.results) {
+			console.log(output.log)
+		}
+		return { uuid: response.data.uuid, results: response.data.results }
+	}
 }
 
 type StoreContents = {
@@ -38,7 +69,7 @@ type StoreContents = {
 	layerColors: Record<string, RgbaColor>
 	baseImage?: string,
 	specification: string,
-	results: Record<string,[Result]> // Key is uuid returned from server's Run([items])
+	responses: Record<string, Response> // Key is uuid returned from server's Run([items])
 }
 
 export type Store = Writable<StoreContents>
@@ -60,28 +91,54 @@ export class State {
 		layerColors: {},
 		baseImage: undefined,
 		specification: "",
-		results: {}
+		responses: {}
 	}) // todo: make the public version readonly
 
 	private iup(fn: (st: StoreContents) => void, store = this.store) {
 		store.update(($store) => produce($store, fn))
 	}
 
-	private getLayerNames($store: StoreContents) {
-		function layers(item: Item) {
-			return item.layers.map((layer) => layer.name) as string[]
+	private getLayers($store: StoreContents): Record<string,string[]> {
+		function layers(items: Item[]) {
+			return items.map((item) => item.layers.map(layer => ({ provenance: `/datasets/${item.dataset}`, name: layer.name }))).flat()
 		}
-		function resultLayers(result: Result) {
-			return result.output.layers.map((layer : any)=>layer.name) // TODO: make types more precise
+
+		function responseLayers(response: Response) {
+			const results: Result[] = response.results
+			const layersProvenance = results.map((result: Result) =>
+				result.output.layers.map((layer) => ({ provenance: `/results/${response.uuid}`, name: layer.name }))
+			)
+			return layersProvenance.flat()
 		}
-		const allLayers = $store.openItems.map(layers)
-		const allResultLayers = Object.values($store.results).map((resultArray)=>resultArray.map(resultLayers))
-		const s = new Set(allLayers.flat().concat(allResultLayers.flat(2)))
-		const returnValue = [...new Set(s)]
-		//if ($store.baseImage) s.delete($store.baseImage)
-		return returnValue
+
+		function key(x: { provenance: string; name: string }) {
+			return `${x.provenance}/${x.name}`
+		}
+
+		function unique(l: { provenance: string, name: string }[]) {
+			const tmp = {} as Record<string,{ provenance: string, name: string }>
+			for (const provName of l) {
+				const k = key(provName)
+				if (!(k in tmp)) tmp[k] = provName
+			}
+			return Object.values(tmp)
+		}
+
+		const uniques = unique(layers($store.openItems))
+		for (const [uuid,response] of Object.entries($store.responses)) {
+			uniques.concat(unique(responseLayers(response)))
+		}
+
+		const tmp : Record<string,string[]> = {}
+		for (const unique of uniques) {
+			if (unique.provenance in tmp) tmp[unique.provenance].push(unique.name)
+			else tmp[unique.provenance] = [unique.name]
+		}
+		
+		return tmp
 	}
-	layerNames = derived(this.store, this.getLayerNames)
+
+	layerNames = derived(this.store, this.getLayers)
 
 	async setBaseImage(layer: string) {
 		this.iup(($store) => {
@@ -114,20 +171,9 @@ export class State {
 	}
 
 	async run(item: Item,specification: string) {
-		const response = await axios.post('/run', {
-			specification: specification,
-			items: [{ name: item.name, dataset: item.dataset }]
-		})
-		const result = response.data		
-		if (result.error && result.error!='') {
-			console.log("Error\n",result.log)
-		} else {
-			for (const {output,item} of result.results ) {
-				console.log(output.log)
-			}
-			this.iup($store=>{ $store.results[result.uuid]=result.results })			
-		}
+		console.log(internal_run(item,specification))
 	}
+
 
 
 	// itemResults = derived(this.store,$store=>{

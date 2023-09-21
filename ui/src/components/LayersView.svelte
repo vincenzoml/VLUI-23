@@ -16,27 +16,31 @@
 	})()
 
 	$: {
-		if (!selectedBaseImage && $layerNames.length > 0) selectedBaseImage = $layerNames[0]
+		if (!selectedBaseImage && $layerNames[0].length > 0) selectedBaseImage = $layerNames[0][0]
 	}
-
 </script>
 
-{#if $layerNames.length > 0}
-<div class="w-full select-none flex flex-col gap-3">
-	<Select class="w-full"
-		placeholder="base image (open cases first)"
-		underline
-		size="md"
-		items={$layerNames.map((layer) => ({ name: layer, value: layer }))}
-		label="Base image"
-		variant="outlined"
-		bind:value={selectedBaseImage}
-	/>
+AAA
+<!-- 
+{#if $layerNames[0].length > 0}
+	<div class="w-full select-none flex flex-col gap-3 overflow-auto">
+		<Select
+			class="w-full"
+			placeholder="base image (open cases first)"
+			underline
+			size="md"
+			items={$layerNames.flat().map((layer) => ({ name: layer, value: layer }))}
+			label="Base image"
+			variant="outlined"
+			bind:value={selectedBaseImage}
+		/>
 
-	{#each $layerNames.filter((layer) => $store.baseImage != layer) as layer}
-		<LayerView {layer} />
-	{/each}
+		{#each $layerNames as layerGroup}
+			{#each layerGroup.filter((layer) => $store.baseImage != layer) as layer}
+				<LayerView {layer} />
+			{/each}
+			<hr />
+		{/each}
 
-	<hr/>
-</div>
-{/if}
+	</div>
+{/if} -->
