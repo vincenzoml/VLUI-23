@@ -62,16 +62,6 @@
 	}
 
 	const specification=state.specification
-
-	async function run() {
-		const response = await axios.post('/run', {
-			specification: $specification,
-			items: [{ name: item.name, dataset: item.dataset }]
-		})
-		const result = JSON.parse(response.data)
-		console.log(result.log)
-	}
-
 </script>
 
 <Card padding="none">
@@ -87,7 +77,7 @@
 		</div>
 		<div class="flex">
 			<div style="flex-grow:1" />
-			<Button outline style="flex-grow:0" on:click={run}>Run</Button>			
+			<Button outline style="flex-grow:0" on:click={()=>state.run(item,$specification)}>Run</Button>			
 		</div>
 	</div>
 </Card>

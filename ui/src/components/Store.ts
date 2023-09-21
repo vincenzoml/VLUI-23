@@ -82,7 +82,7 @@ export class State {
 		return subStore(this.store, ($store) => $store.layerColors[layer])
 	}
 
-	specification = subStore(this.store,($store)=>$store.specification)
+	specification = subStore(this.store, ($store) => $store.specification)
 
 	async setSelectedDataset(dataset: string) {
 		this.iup(($store) => {
@@ -100,6 +100,19 @@ export class State {
 		this.iup(($store) => {
 			$store.itemsOfSelectedDataset = items
 		})
+	}
+
+	async run(item: Item,specification: string) {
+		const response = await axios.post('/run', {
+			specification: specification,
+			items: [{ name: item.name, dataset: item.dataset }]
+		})
+		const result = JSON.parse(response.data)
+		if (result.error && result.error!='') {
+			console.log("Error\n",result.log)
+		} else {
+			console.log(result.print)
+		}
 	}
 
 	async openItem(dataset: string, item: string) {
@@ -142,3 +155,4 @@ export class State {
 	// 	setContext('state', this)
 	// }
 }
+
