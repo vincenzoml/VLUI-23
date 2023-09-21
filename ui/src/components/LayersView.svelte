@@ -36,5 +36,7 @@
 	{#each $layerNames.filter((layer) => $store.baseImage != layer) as layer}
 		<LayerView {layer} />
 	{/each}
+
+	<hr/>
 </div>
 {/if}
