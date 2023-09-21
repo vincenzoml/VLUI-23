@@ -11,8 +11,8 @@
     const specification = state.specification
 
     onMount(async ()=> {
-        const {data} = await axios.get("specifications/GBM-HGG-TACAS19.imgql")
-        value = data
+        const {data} = await axios.get("specifications/test.imgql")
+        $specification=data
     })
     
 </script>

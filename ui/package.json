@@ -36,6 +36,7 @@
 	"type": "module",
 	"dependencies": {
 		"@codemirror/lang-javascript": "^6.2.1",
+		"@types/uuid": "^9.0.4",
 		"axios": "^1.5.0",
 		"execa": "^8.0.1",
 		"flowbite-svelte-icons": "^0.4.4",

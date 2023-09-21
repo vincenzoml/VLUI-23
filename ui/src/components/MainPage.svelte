@@ -63,7 +63,9 @@
 	let fit = 2
 
 	function toggleDataset() {
-		datasetVisible = !datasetVisible
+		if ($store.datasets?.length > 0) {
+			datasetVisible = !datasetVisible
+		}
 	}
 
 	function toggleLayers() {
@@ -112,8 +114,8 @@
 		</ToolbarButton>
 	</div>
 	<div class="flex gap-6 w-full flex-grow-1 p-2">
-		{#if datasetVisible}
-			<div class="flex-grow-0 flex flex-col h-full">
+		{#if datasetVisible && $store.datasets.length>0}
+			<div class="flex-grow-0 flex flex-col h-full min-w-max">
 				<DatasetSelector />
 				<DatasetView />
 			</div>

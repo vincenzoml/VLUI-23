@@ -2,9 +2,9 @@ import { json } from '@sveltejs/kit'
 import { execa } from 'execa'
 import { promises as fs } from 'fs'
 
-import { listLayers, resolveLayer } from '../datasets/Datasets'
+import { resolveLayer } from '../datasets/Datasets'
 import type { Layer } from '../datasets/Datasets'
-import type { ExecaChildProcess } from 'execa'
+import { getUUID } from '$lib/uniqueId'
 
 const voxlogica = '/home/VoxLogicA/binaries/VoxLogicA_1.3.3-experimental_linux-x64/VoxLogicA'
 
@@ -43,17 +43,25 @@ export async function POST({ request }) {
 	const concatSpec = pieces.join('\n')
 	const resolvedSpec = substitute(concatSpec, Object.keys(resolvedVars).map((x) => x.substring(1)))
 
-	const dirName = await fs.mkdtemp('/tmp/my-pipe-')
+	const uuid = getUUID()
+	const dirName = `./results/${uuid}`
+	await fs.mkdir(dirName)
 	const specificationPath = `${dirName}/specification.imgql`
 	await fs.writeFile(specificationPath, resolvedSpec)
 
+	let stdout: string = '{ error: "Unknown error"; log: "" }'
 	// Read from the pipe using the executable
 	try {
-		const { stdout } = await execa(voxlogica, ['--json', specificationPath])
-		return json(stdout)
+		const vlresult = await execa(voxlogica, ['--json', specificationPath])
+		stdout = vlresult.stdout
 
 	} catch (e: any) {
 		// https://github.com/sindresorhus/execa/blob/main/lib/error.js	
-		return json(e.stdout)
+		stdout = e.stdout
 	}
+
+	const result = JSON.parse(stdout)
+
+	const response = json({uuid: uuid,results: [{ output: result, item: data.items[0] }]}) // The source code of the "json" function is very helpful
+	return response
 }

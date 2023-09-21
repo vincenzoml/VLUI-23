@@ -1,0 +1,4 @@
+load flair = "/home/VoxLogicA/datasets/BraTS_2019_HGG_Augmented/BraTS19_2013_10_1/BraTS19_2013_10_1_flair.nii.gz"
+let img = intensity(flair)
+
+print "volume" volume(img)>.0

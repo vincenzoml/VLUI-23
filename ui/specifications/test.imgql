@@ -1,0 +1,5 @@
+let img = intensity($flair)
+
+print "volume" volume(img>.0)
+
+save "output.nii.gz" img

@@ -4,12 +4,11 @@ import { derived, writable } from 'svelte/store'
 import { subStore } from "immer-loves-svelte"
 
 
-import { getUID } from '$lib/uniqueId'
+import { getUUID } from '$lib/uniqueId'
 import axios from 'axios'
 
 import { produce } from 'immer'
 
-import { tick } from 'svelte'
 import type { RgbaColor } from 'svelte-awesome-color-picker'
 
 export type Layer = {
@@ -25,6 +24,11 @@ export type Item = {
 	layers: Layer[]
 }
 
+export type Result = { // THIS TYPE SHOULD BE SHARED WITH THE SERVER
+	item: { name: string, dataset: string },
+	output: any
+}
+
 type StoreContents = {
 	datasets: string[]
 	selectedDataset?: string
@@ -33,7 +37,8 @@ type StoreContents = {
 	openLayers: string[]
 	layerColors: Record<string, RgbaColor>
 	baseImage?: string,
-	specification: string
+	specification: string,
+	results: Record<string,[Result]> // Key is uuid returned from server's Run([items])
 }
 
 export type Store = Writable<StoreContents>
@@ -54,7 +59,8 @@ export class State {
 		openLayers: [],
 		layerColors: {},
 		baseImage: undefined,
-		specification: ""
+		specification: "",
+		results: {}
 	}) // todo: make the public version readonly
 
 	private iup(fn: (st: StoreContents) => void, store = this.store) {
@@ -65,10 +71,15 @@ export class State {
 		function layers(item: Item) {
 			return item.layers.map((layer) => layer.name) as string[]
 		}
+		function resultLayers(result: Result) {
+			return result.output.layers.map((layer : any)=>layer.name) // TODO: make types more precise
+		}
 		const allLayers = $store.openItems.map(layers)
-		const s = new Set(allLayers.flat())
+		const allResultLayers = Object.values($store.results).map((resultArray)=>resultArray.map(resultLayers))
+		const s = new Set(allLayers.flat().concat(allResultLayers.flat(2)))
+		const returnValue = [...new Set(s)]
 		//if ($store.baseImage) s.delete($store.baseImage)
-		return [...new Set(s)]
+		return returnValue
 	}
 	layerNames = derived(this.store, this.getLayerNames)
 
@@ -107,16 +118,30 @@ export class State {
 			specification: specification,
 			items: [{ name: item.name, dataset: item.dataset }]
 		})
-		const result = JSON.parse(response.data)
+		const result = response.data		
 		if (result.error && result.error!='') {
 			console.log("Error\n",result.log)
 		} else {
-			console.log(result.print)
+			for (const {output,item} of result.results ) {
+				console.log(output.log)
+			}
+			this.iup($store=>{ $store.results[result.uuid]=result.results })			
 		}
 	}
 
+
+	// itemResults = derived(this.store,$store=>{
+	// 	let ir = {} as Record<string,[Result]> // key is item uuid
+	// 	for (const [r_uuid,r_r] of Object.entries($store.results)) { // TODO make this more efficient, now it's a pain			
+	// 		const item = $store.openItems.find((item)=>item.dataset==r_r.item.dataset && item.name==r_r.item.name)
+	// 		if (item) {
+	// 			ADD LAYERS TO
+	// 		}
+	// 	}
+	// })
+
 	async openItem(dataset: string, item: string) {
-		const uuid = getUID()
+		const uuid = getUUID()
 			; (async () => {
 				const data = (await axios.get(`/datasets/${dataset}/${item}`)).data as Layer[]
 				this.iup(($store) => {

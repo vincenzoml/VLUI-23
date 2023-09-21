@@ -5,7 +5,7 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	server: {		
 		fs: {
-			allow: ['/workspaces/VLUI-23/ui/niivue','/workspaces/VLUI-23/ui']
+			allow: ['/workspaces/VLUI-23/ui/niivue','/workspaces/VLUI-23/ui/specifications','/workspaces/VLUI-23/ui/results']
 		}
 	}
 })
