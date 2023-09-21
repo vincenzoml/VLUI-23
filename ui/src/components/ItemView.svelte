@@ -24,21 +24,6 @@
 	const openLayers = derived(store, ($store) => $store.openLayers)
 
 	let resolvedLayers: string[] = []
-	let preparedLayers: string[] = []
-
-	// $: {
-	// 	resolvedLayers = []
-	// 	preparedLayers = []
-	// 	for (const layer of $layerNames) {
-	// 		const itemLayer = item.layers.find((l) => l.name == layer)
-	// 		if (itemLayer) {
-	// 			const isOpen = $openLayers.includes(layer)
-	// 			const res = `/datasets/${item.dataset}/${item.name}/${itemLayer.path}`
-	// 			if (isOpen) resolvedLayers.push(res)
-	// 			else preparedLayers.push(res)
-	// 		}
-	// 	}
-	// }
 
 	const layerColors=derived(store,($store)=>$store.layerColors)
 
@@ -74,7 +59,7 @@
 			<CloseButton on:click={closeItem} />
 		</div>
 		<div style="width:300px;aspect-ratio:1">
-			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers} prepared={preparedLayers}/>
+			<Niivue canvasID={item.uuid} src={path} {overlayColors} overlays={resolvedLayers}/>
 		</div>
 		<div class="flex">
 			<div style="flex-grow:1" />

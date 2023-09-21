@@ -12,6 +12,7 @@ import { produce } from 'immer'
 import type { RgbaColor } from 'svelte-awesome-color-picker'
 
 export type Layer = {
+	provenance: string
 	name: string
 	path: string // THIS IS RELATIVE TO AN ITEM, WHERAS "PROVENANCE" IS GLOBAL
 }
@@ -103,16 +104,16 @@ export class State {
 
 	private getLayers($store: StoreContents): { provenance: string, names: string[] }[] {
 		function layers(items: Item[]) {
-			return items.map((item) => item.layers.map(layer => ({ provenance: `/datasets`, name: layer.name }))).flat()
+			return items.map((item) => item.layers.map(layer => ({ provenance: layer.provenance, name: layer.name }))).flat()
 		}
 
-		function responseLayers(response: Response) {
-			const results: Result[] = response.results
-			const layersProvenance = results.map((result: Result) =>
-				result.output.layers.map((layer) => ({ provenance: `/results/${response.uuid}`, name: layer.name }))
-			)
-			return layersProvenance.flat()
-		}
+		// function responseLayers(response: Response) {
+		// 	const results: Result[] = response.results
+		// 	const layersProvenance = results.map((result: Result) =>
+		// 		result.output.layers.map((layer) => ({ provenance: `/results/${response.uuid}`, name: layer.name }))
+		// 	)
+		// 	return layersProvenance.flat()
+		// }
 
 
 
@@ -125,11 +126,12 @@ export class State {
 			return Object.values(tmp)
 		}
 
+
 		let uniques = unique(layers($store.openItems))
 
-		for (const response of $store.responses) {
-			uniques = uniques.concat(unique(responseLayers(response)))
-		}
+		// for (const response of $store.responses) {
+		// 	uniques = uniques.concat(unique(responseLayers(response)))
+		// }
 
 		const tmp: Record<string, string[]> = {}
 		const provenances: string[] = [] // Used to record the order of provenances!
@@ -142,7 +144,8 @@ export class State {
 			}
 		}
 
-		return provenances.map((provenance) => ({ provenance: provenance, names: tmp[provenance] }))
+		const returnValue = provenances.map((provenance) => ({ provenance: provenance, names: tmp[provenance] }))
+		return returnValue
 	}
 
 	$getLayers = derived(this.store, this.getLayers)
@@ -154,7 +157,7 @@ export class State {
 	}
 
 	layerColor(provenance: string, name: string) {
-		return subStore(this.store, ($store) => $store.layerColors[layerKey(provenance,name)])
+		return subStore(this.store, ($store) => $store.layerColors[layerKey(provenance, name)])
 	}
 
 	specification = subStore(this.store, ($store) => $store.specification)
@@ -198,13 +201,13 @@ export class State {
 	// })
 
 	private updateItemLayersFromResults() {
-		this.iup($store=>{
+		this.iup($store => {
 			for (const item of $store.openItems) {
 				for (const response of $store.responses) { // TODO: this is not efficient, the data structures should be improved; items should be referenced in openItems, not repeated
 					for (const result of response.results) {
-						if (result.item.dataset==item.dataset && result.item.name==item.name) {
+						if (result.item.dataset == item.dataset && result.item.name == item.name) {
 							for (const layer of result.output.layers) {
-								item.layers.push({name: layer.name,path: layer.name+layer.extension})
+								item.layers.push({ provenance: `/results/${response.uuid}`, name: layer.name, path: layer.name + layer.extension })
 							}
 						}
 					}
@@ -220,7 +223,7 @@ export class State {
 				this.iup(($store) => {
 					const item = $store.openItems.find((it) => uuid == it.uuid)
 					if (item) {
-						item.layers = data
+						item.layers = data.map((layer) => ({ ...layer, provenance: "/datasets" }))
 					}
 				})
 			})()

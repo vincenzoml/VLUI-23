@@ -68,5 +68,5 @@
 			}}>{layer}</Button
 		>
 	</ButtonGroup>
-	{[provenance,layer]}
+	<!-- {[provenance,layer]} -->
 </div>

@@ -6,7 +6,6 @@
 
 	export let src: string
 	export let overlays: string[] = []
-	export let prepared: string[] = []
 	export let canvasID: string
 
 	import type { RgbaColor } from 'svelte-awesome-color-picker'
@@ -15,8 +14,6 @@
 	let nv: any
 
 	let NVI: any
-
-	import { State, getStore } from './Store'
 
 	// import Worker from './Worker?worker'
 	// let worker: Worker
