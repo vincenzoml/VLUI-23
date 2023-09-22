@@ -70,6 +70,7 @@ type StoreContents = {
 	layerColors: Record<string, RgbaColor>
 	baseImage?: string,
 	specification: string,
+	specifications: string[],
 	responses: Response[] // Key is uuid returned from server's Run([items])
 }
 
@@ -95,7 +96,8 @@ export class State {
 		layerColors: {},
 		baseImage: undefined,
 		specification: "",
-		responses: []
+		responses: [],
+		specifications: []
 	}) // todo: make the public version readonly
 
 	private iup(fn: (st: StoreContents) => void, store = this.store) {
@@ -199,6 +201,8 @@ export class State {
 	// 		}
 	// 	}
 	// })
+
+	readonly specifications = derived(this.store,$store=>$store.specifications)
 
 	private updateItemLayersFromResults() {
 		this.iup($store => {

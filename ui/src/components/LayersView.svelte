@@ -37,9 +37,9 @@
 		{#each $layers as layerGroup}
 			<!-- <Label>{layerGroup.provenance.split('/').pop()}</Label> -->
 			<!-- <div class="max-w-min h-full select-none flex flex-col gap-3 justify-start"> -->
-				{#each layerGroup.names.filter((layer) => $store.baseImage != layer) as layer}
-					<LayerView provenance={layerGroup.provenance} {layer} />
-				{/each}
+			{#each layerGroup.names.filter((layer) => $store.baseImage != layer) as layer}
+				<LayerView provenance={layerGroup.provenance} {layer} />
+			{/each}
 			<!-- </div> -->
 			<hr />
 		{/each}
