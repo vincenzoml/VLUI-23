@@ -60,7 +60,8 @@
 
 	onMount(async () => {
 		//@ts-ignore
-		const { Niivue, NVImage } = await import('../../niivue/src/niivue')
+		const { Niivue, NVImage } = await import('@niivue/niivue')
+		// const { Niivue, NVImage } = await import('../../niivue/src/niivue')
 		// worker = new Worker()
 		// worker.onmessage = (msg: any) => {
 		// 	const overlay = msg.overlay
